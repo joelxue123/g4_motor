@@ -78,8 +78,6 @@ void Error_Handler(void);
 #define M1_BUS_VOLTAGE_GPIO_Port GPIOC
 #define RS485_DE_Pin GPIO_PIN_1
 #define RS485_DE_GPIO_Port GPIOA
-#define RS485_TX_Pin GPIO_PIN_2
-#define RS485_TX_GPIO_Port GPIOA
 #define RS485_RX_Pin GPIO_PIN_3
 #define RS485_RX_GPIO_Port GPIOA
 #define M1_OPAMP2_EXT_GAIN_Pin GPIO_PIN_5
@@ -112,8 +110,6 @@ void Error_Handler(void);
 #define M1_PWM_WL_GPIO_Port GPIOE
 #define M1_PWM_WH_Pin GPIO_PIN_13
 #define M1_PWM_WH_GPIO_Port GPIOE
-#define GD_READY_Pin GPIO_PIN_14
-#define GD_READY_GPIO_Port GPIOE
 #define GD_NFAULT_Pin GPIO_PIN_15
 #define GD_NFAULT_GPIO_Port GPIOE
 #define GD_SCL_Pin GPIO_PIN_8
@@ -128,8 +124,8 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
-#define SPI_ENCODER_CS_Pin GPIO_PIN_2
-#define SPI_ENCODER_CS_GPIO_Port GPIOD
+#define RS485_TX_Pin GPIO_PIN_5
+#define RS485_TX_GPIO_Port GPIOD
 #define LED_RED_Pin GPIO_PIN_6
 #define LED_RED_GPIO_Port GPIOB
 #define LED_BLUE_Pin GPIO_PIN_7

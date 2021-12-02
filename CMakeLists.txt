@@ -33,7 +33,8 @@ else ()
     add_compile_options(-Og -g -gdwarf-2)
 endif ()
 
-include_directories(Board/ERG26/Inc
+include_directories(MotorControl/
+                    Board/ERG26/Inc
                     ThirdParty/STM32G4xx_HAL_Driver/Inc
                     ThirdParty/STM32G4xx_HAL_Driver/Inc/Legacy
                     ThirdParty/CMSIS/DSP/Include
@@ -45,6 +46,7 @@ add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx -DFPU_FPV4)
 file(GLOB_RECURSE SOURCES 
     "Board/ERG26/*.*" 
     "ThirdParty/*.*"
+    "MotorControl/*.*"
     "${STARTUP_FILE}")
 
 CMSIS_CompileELF()

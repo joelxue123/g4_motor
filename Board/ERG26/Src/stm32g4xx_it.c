@@ -40,13 +40,40 @@
 
 /* USER CODE END PM */
 
-/* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+volatile int g_pmsm_ia_org = 0;
+volatile int g_pmsm_ib_org = 0;
+volatile int g_pmsm_ia1_org = 0;
+volatile int g_pmsm_ib1_org = 0;
+volatile int g_bus_volt_org = 0;
 
+volatile uint32_t g_encoder_value_org = 0;
+volatile uint32_t g_encoder1_value_org = 0;
+uint32_t g_encoder_value_temp = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
+inline static void ADC_DataUpdate(void)
+{
+  g_pmsm_ia_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1);
+  g_pmsm_ib_org = LL_ADC_INJ_ReadConversionData12(ADC2, LL_ADC_INJ_RANK_1);
+  g_bus_volt_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2);
+
+  //g_encoder_value_org = 4095 - LL_TIM_GetCounter(TIM3);
+  //g_encoder_value_org = 0;
+}
+
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
+  g_encoder_value_org = (g_encoder_value_temp & 0x7fff);
+}
+
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+  HAL_SPI_Receive_DMA(hspi, (uint8_t *)(&g_encoder_value_temp), 1);
+}
 
 /* USER CODE END PFP */
 
@@ -300,7 +327,16 @@ void ADC1_2_IRQHandler(void)
 
   /* USER CODE END ADC1_2_IRQn 0 */
   /* USER CODE BEGIN ADC1_2_IRQn 1 */
+  if(LL_ADC_IsEnabledIT_JEOS(ADC2))
+  {
+    uint16_t ang_reg_v = 0x8021;
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
+    HAL_SPI_Transmit_DMA(&hspi1, (uint8_t *)(&ang_reg_v), 1);
 
+    ADC_DataUpdate();
+    high_realtime_interrupt();
+    LL_ADC_ClearFlag_JEOS(ADC2);
+  }
   /* USER CODE END ADC1_2_IRQn 1 */
 }
 
