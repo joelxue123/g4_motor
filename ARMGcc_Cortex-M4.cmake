@@ -45,11 +45,6 @@ function(CMSIS_CrossCompilingConfiguration)
     else()
         add_compile_options(-mfloat-abi=soft)
     endif()
-
-    add_link_options(-lc -lm)
-    add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
-    add_link_options(-ffast-math -fno-finite-math-only -specs=nosys.specs -specs=nano.specs)
-    add_link_options(-mcpu=cortex-m4 -mthumb)
     
     set(STARTUP_FILE "Startup/Gcc/*.*" CACHE STRING "global")
     #判断链接脚本是否存在
@@ -66,6 +61,11 @@ endfunction()
 
 #接口: 生成elf文件
 function(CMSIS_CompileELF)
+    add_link_options(-lc -lm)
+    add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
+    add_link_options(-ffast-math -fno-finite-math-only -specs=nosys.specs -specs=nano.specs)
+    add_link_options(-mcpu=cortex-m4 -mthumb)
+
     add_executable(${PROJECT_NAME}.elf ${SOURCES})
 endfunction()
 
