@@ -698,7 +698,7 @@ HAL_StatusTypeDef STSPIN32G4_reset(STSPIN32G4_HandleTypeDef* hdl)
 
 HAL_StatusTypeDef STSPIN32G4_standby(STSPIN32G4_HandleTypeDef* hdl, bool enableStbyReg)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t i2cReg = 0;
   uint32_t tickStart;
   uint32_t tickFreq = HAL_GetTickFreq()/1000; // in kHz to have ms base
@@ -782,7 +782,7 @@ HAL_StatusTypeDef STSPIN32G4_standby(STSPIN32G4_HandleTypeDef* hdl, bool enableS
 
 HAL_StatusTypeDef STSPIN32G4_wakeup(STSPIN32G4_HandleTypeDef* hdl, uint8_t timeout_ms)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint32_t tickStart;
   uint32_t tickFreq = HAL_GetTickFreq()/1000; // in kHz to have ms base
   STSPIN32G4_statusTypeDef statReg;

@@ -28,7 +28,7 @@ void main_setup(void)
 
     system_delay_ms(100);
     opt_step = 0;
-
+    led_fault_clr();
     system_delay_ms(2000);
 
     opt_step = 0;

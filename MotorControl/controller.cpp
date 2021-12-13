@@ -153,7 +153,7 @@ void Controller::move_to_pos(float goal_point, float cur_pos) {
 }
 
 bool Controller::update(OpticalEncoder& encoder_, float pos_feedbak, float& ret_Iq, float Iq_limit){
-    const float current_meas_period = 0.0000625f;
+    const float current_meas_period = 0.00005f;
     pos_estimate = (encoder_.count_in_cpr_ / (float)(encoder_.config_.cpr) + (float)encoder_.turn_) * 360.0f;
     vel_estimate = (encoder_.vel_estimate_ / (float)(encoder_.config_.cpr)) * 360.0f;
     // Only runs if anticogging_.calib_anticogging is true; non-blocking

@@ -25,6 +25,7 @@
 #include "dma.h"
 #include "fmac.h"
 #include "i2c.h"
+#include "interface.h"
 #include "opamp.h"
 #include "spi.h"
 #include "tim.h"
@@ -115,6 +116,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
+
+  main_setup();
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
+  HAL_Delay(100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,7 +127,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    main_loop();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

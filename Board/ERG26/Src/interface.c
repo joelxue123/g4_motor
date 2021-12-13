@@ -28,14 +28,26 @@ STSPIN32G4_HandleTypeDef hdlG4;
 void high_realtime_interrupt_init(void)
 {
     HAL_StatusTypeDef ret = STSPIN32G4_init(&hdlG4);
-    STSPIN32G4_clearFaults(&hdlG4);
-    STSPIN32G4_wakeup(&hdlG4, 5);
-
+    /*************************************************/
+    /*   STSPIN32G4 driver component initialization  */
+    /*************************************************/
+    STSPIN32G4_init( &hdlG4 );
+    STSPIN32G4_reset( &hdlG4 );
+    STSPIN32G4_setVCC( &hdlG4, (STSPIN32G4_confVCC){ .voltage = _EXT,
+                                                           .useNFAULT = true,
+                                                           .useREADY = false } );
+    STSPIN32G4_setVDSP( &hdlG4, (STSPIN32G4_confVDSP){ .deglitchTime = _4us,
+                                                             .useNFAULT = true } );
+    STSPIN32G4_clearFaults( &hdlG4 );
+   
+    LL_TIM_GenerateEvent_CC4(TIM1);
     LL_TIM_EnableCounter(TIM1);
     LL_TIM_EnableAllOutputs(TIM1);
-
+    
     LL_ADC_Enable(ADC1);
     LL_ADC_Enable(ADC2);
+    LL_ADC_INJ_StartConversion(ADC2);
+    LL_ADC_INJ_StartConversion(ADC1);
     LL_ADC_EnableIT_JEOS(ADC2);
 }
 
@@ -50,29 +62,20 @@ void encoder_init(int __init_value, int __cpr)
 
 void motor_servo_on(int num)
 {
-    if(num == 0)
-    {
-        //LL_TIM_EnableAllOutputs(TIM1);
-        //HAL_GPIO_WritePin(PIN_EN_GATE_1_GPIO_Port, PIN_EN_GATE_1_Pin, GPIO_PIN_SET);
-    }
+    //LL_TIM_EnableAllOutputs(TIM1);
+    //HAL_GPIO_WritePin(PIN_EN_GATE_1_GPIO_Port, PIN_EN_GATE_1_Pin, GPIO_PIN_SET);
 }
 
 void motor_servo_off(int num)
 {
-    if(num == 0)
-    {
-        //LL_TIM_DisableAllOutputs(TIM1);
-    }
+    //LL_TIM_DisableAllOutputs(TIM1);
 }
 
 void motor_set_out_put(int num, uint32_t pha, uint32_t phb, uint32_t phc)
 {
-    if(num == 0)
-    {
-        LL_TIM_OC_SetCompareCH1(TIM1, pha);
-        LL_TIM_OC_SetCompareCH2(TIM1, phb);
-        LL_TIM_OC_SetCompareCH3(TIM1, phc);
-    }
+    LL_TIM_OC_SetCompareCH1(TIM1, pha);
+    LL_TIM_OC_SetCompareCH2(TIM1, phb);
+    LL_TIM_OC_SetCompareCH3(TIM1, phc);
 }
 
 void motor_brake_on(int num)

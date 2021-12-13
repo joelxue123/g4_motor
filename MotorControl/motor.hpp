@@ -117,7 +117,7 @@ public:
     float Ialpha = 0;
     float Ibeta = 0;
     float Izero = 0;
-    const float current_meas_period = 0.0000625f;
+    const float current_meas_period = 0.00005f;
     bool is_enable = false;
     bool is_calibrated_ = false;
     bool is_over_current = false;

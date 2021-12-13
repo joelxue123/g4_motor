@@ -72,7 +72,7 @@ void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-  HAL_SPI_Receive_DMA(hspi, (uint8_t *)(&g_encoder_value_temp), 1);
+  HAL_SPI_Receive_IT(hspi, (uint8_t *)(&g_encoder_value_temp), 1);
 }
 
 /* USER CODE END PFP */
@@ -331,7 +331,7 @@ void ADC1_2_IRQHandler(void)
   {
     uint16_t ang_reg_v = 0x8021;
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
-    HAL_SPI_Transmit_DMA(&hspi1, (uint8_t *)(&ang_reg_v), 1);
+    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *)(&ang_reg_v), 1);
 
     ADC_DataUpdate();
     high_realtime_interrupt();
