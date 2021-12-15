@@ -44,6 +44,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+extern STSPIN32G4_HandleTypeDef hdlG4;
+STSPIN32G4_statusTypeDef g_spin_status;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -127,6 +129,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    STSPIN32G4_getStatus(&hdlG4, &g_spin_status);
     main_loop();
     /* USER CODE BEGIN 3 */
   }

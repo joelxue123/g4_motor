@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32g4xx_hal_gpio.h"
 #include "stm32g4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -50,6 +51,7 @@ volatile int g_bus_volt_org = 0;
 volatile uint32_t g_encoder_value_org = 0;
 volatile uint32_t g_encoder1_value_org = 0;
 uint32_t g_encoder_value_temp = 0;
+uint32_t g_fault_flag = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,7 +61,7 @@ inline static void ADC_DataUpdate(void)
   g_pmsm_ia_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1);
   g_pmsm_ib_org = LL_ADC_INJ_ReadConversionData12(ADC2, LL_ADC_INJ_RANK_1);
   g_bus_volt_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2);
-
+  g_fault_flag = HAL_GPIO_ReadPin(GD_NFAULT_GPIO_Port, GD_NFAULT_Pin);
   //g_encoder_value_org = 4095 - LL_TIM_GetCounter(TIM3);
   //g_encoder_value_org = 0;
 }

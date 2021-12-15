@@ -60,13 +60,13 @@ bool Motor::phase_current_from_adcval(void) {
 
     if(config_.num == 0)
     {
-        current_meas_.phB = (float) (g_pmsm_ib_org - ADC_offset_.ibOffset) * k;
-        current_meas_.phC = (float) (g_pmsm_ia_org - ADC_offset_.iaOffset) * k;
+        current_meas_.phB = -(float) (g_pmsm_ib_org - ADC_offset_.ibOffset) * k;
+        current_meas_.phC = -(float) (g_pmsm_ia_org - ADC_offset_.iaOffset) * k;
     }
     else
     {
-        current_meas_.phB = (float) (g_pmsm_ib1_org - ADC_offset_.ibOffset) * k;
-        current_meas_.phC = (float) (g_pmsm_ia1_org - ADC_offset_.iaOffset) * k;
+        current_meas_.phB = -(float) (g_pmsm_ib1_org - ADC_offset_.ibOffset) * k;
+        current_meas_.phC = -(float) (g_pmsm_ia1_org - ADC_offset_.iaOffset) * k;
     }
     current_meas_.phA = -(current_meas_.phB + current_meas_.phC);
     //current_meas_.phC = -(current_meas_.phB + current_meas_.phA);

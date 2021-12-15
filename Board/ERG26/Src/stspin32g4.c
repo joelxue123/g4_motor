@@ -235,7 +235,7 @@ HAL_StatusTypeDef STSPIN32G4_get3V3(STSPIN32G4_HandleTypeDef* hdl, bool* enabled
 
 HAL_StatusTypeDef STSPIN32G4_setVCC(STSPIN32G4_HandleTypeDef* hdl, STSPIN32G4_confVCC vcc)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t i2cReg = 0;
   
   if(hdl == NULL)
@@ -484,7 +484,7 @@ HAL_StatusTypeDef STSPIN32G4_getMinimumDeadTime(STSPIN32G4_HandleTypeDef* hdl, b
 
 HAL_StatusTypeDef STSPIN32G4_setVDSP(STSPIN32G4_HandleTypeDef* hdl, STSPIN32G4_confVDSP vdsp)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t i2cReg = 0;
   
   if(hdl == NULL)
@@ -679,7 +679,7 @@ HAL_StatusTypeDef STSPIN32G4_clearFaults(STSPIN32G4_HandleTypeDef* hdl)
 
 HAL_StatusTypeDef STSPIN32G4_reset(STSPIN32G4_HandleTypeDef* hdl)
 {
-  HAL_StatusTypeDef status;
+  HAL_StatusTypeDef status = HAL_OK;
   uint8_t i2cReg = 0xff;
   
   if(hdl == NULL)

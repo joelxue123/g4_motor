@@ -29,7 +29,7 @@ void main_setup(void)
     system_delay_ms(100);
     opt_step = 0;
     led_fault_clr();
-    system_delay_ms(2000);
+    system_delay_ms(100);
 
     opt_step = 0;
 }
@@ -65,8 +65,9 @@ void high_realtime_interrupt(void)
 
     if(opt_step == 4 && g_motor.state_ == Motor::STATE_NORMAL)
     {
+        float _pos = g_optical_encoder.count_in_cpr_ + g_optical_encoder.turn_ * g_optical_encoder.config_.cpr;
         float _phase = g_optical_encoder.phase_;
-        //g_ctrl.update(g_optical_encoder, ,g_target_iq, g_motor.config_.requested_current_range);
+        g_ctrl.update(g_optical_encoder, _pos,g_target_iq, g_motor.config_.requested_current_range);
         g_motor.FOC_current(g_target_id, g_target_iq, _phase, 0.0f);
     }
 }
