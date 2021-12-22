@@ -4,12 +4,12 @@ set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.17)
 
 #引用ARMClang_Cortex-M4.cmake
-include(ARMClang_Cortex-M4.cmake)
+include(ARMGcc_Cortex-M4.cmake)
 
 CMSIS_EnableFPU(TRUE)
 
 #设置Sections脚本路径
-CMSIS_SetSectionsScriptPath(${CMAKE_HOME_DIRECTORY}/STM32G431VB.sct)
+CMSIS_SetSectionsScriptPath(${CMAKE_HOME_DIRECTORY}/STM32G431VBTx_FLASH.ld)
 
 CMSIS_CrossCompilingConfiguration()
 
@@ -41,7 +41,7 @@ include_directories(MotorControl/
                     ThirdParty/CMSIS/Device/ST/STM32G4xx/Include
                     ThirdParty/CMSIS/Include)
 
-add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx -DFPU_FPV4)
+add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx -DFPU_FPV4 -DUSER_VECT_TAB_ADDRESS)
 
 file(GLOB_RECURSE SOURCES 
     "Board/ERG26/*.*" 

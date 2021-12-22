@@ -38,6 +38,7 @@ int32_t g_tick_time = 0;
 void main_loop(void)
 {
     g_tick_time++;
+    led_fault_clr();
     led_state_toggle();
     system_delay_ms(500);
 }

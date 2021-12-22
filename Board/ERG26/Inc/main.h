@@ -124,8 +124,8 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
-#define RS485_TX_Pin GPIO_PIN_5
-#define RS485_TX_GPIO_Port GPIOD
+#define RS485_TX_Pin GPIO_PIN_2
+#define RS485_TX_GPIO_Port GPIOA
 #define LED_RED_Pin GPIO_PIN_6
 #define LED_RED_GPIO_Port GPIOB
 #define LED_BLUE_Pin GPIO_PIN_7

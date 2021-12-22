@@ -118,10 +118,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
-
   main_setup();
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-  HAL_Delay(100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
