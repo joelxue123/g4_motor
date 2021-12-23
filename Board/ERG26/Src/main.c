@@ -28,6 +28,7 @@
 #include "interface.h"
 #include "opamp.h"
 #include "spi.h"
+#include "stm32g4xx_hal.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -39,7 +40,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef void (*Function_Pointer)(void);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -50,7 +51,7 @@ STSPIN32G4_statusTypeDef g_spin_status;
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define G4_BOOTLOADER_ADDRESS 0x801C000
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -63,7 +64,28 @@ STSPIN32G4_statusTypeDef g_spin_status;
 void SystemClock_Config(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
+/**
+  * @brief  This function is used to jump to a given address.
+  * @param  Address The address where the function will jump.
+  * @retval None.
+  */
+void JumpToAddress(uint32_t Address)
+{  
+  Function_Pointer jump_to_address;
 
+  /* Deinitialize all HW resources used by the Bootloader to their reset values */
+  HAL_DeInit();
+
+  /* Enable IRQ */
+  __enable_irq();
+
+  jump_to_address = (Function_Pointer)(*(__IO uint32_t *)(Address + 4U));
+
+  /* Initialize user application's stack pointer */
+  __set_MSP(*(__IO uint32_t *) Address);
+
+  jump_to_address();
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -116,6 +138,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+  JumpToAddress(G4_BOOTLOADER_ADDRESS);
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
   main_setup();
