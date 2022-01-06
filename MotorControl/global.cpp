@@ -22,17 +22,17 @@
 
 trap_config_t g_trap_conf =
 {
-    .vel_limit =  20000.00f * 6.0f,   // [degree/s]
-    .accel_limit = 2000000.0f * 6.0f,  // [degree/s^2]
-    .decel_limit = 2000000.0f * 6.0f, // [degree/s^2]
+    .vel_limit =  10000.00f * 6.0f,   // [degree/s]
+    .accel_limit = 1000000.0f * 6.0f,  // [degree/s^2]
+    .decel_limit = 1000000.0f * 6.0f, // [degree/s^2]
     .A_per_css = 0.0f,   // [A/(degree/s^2)]
 };
 
 ctrl_config_t g_ctrl_conf =
 {
-    .pos_gain = 50.0f,  // [(degree/s) / degree]
-    .vel_gain = 0.01f / 360.0f,  // [A/(degree/s)] (速度环kp = bandwidth * J / kt, 取带宽40Hz，大关节空载转动惯量比测得为: J/kt = 3.44 / (150 * 2pi * 1.01) A/(rad/s^2))
-    .vel_integrator_gain = 0.02f / 360.0f,  // [A/(degree/s * s)] (速度环ki = bandwidth * kp, 取带宽40Hz，控制)
+    .pos_gain = 40.0f,  // [(degree/s) / degree]
+    .vel_gain = 0.005f / 360.0f,  // [A/(degree/s)] (速度环kp = bandwidth * J / kt, 取带宽40Hz，大关节空载转动惯量比测得为: J/kt = 3.44 / (150 * 2pi * 1.01) A/(rad/s^2))
+    .vel_integrator_gain = 0.01f / 360.0f,  // [A/(degree/s * s)] (速度环ki = bandwidth * kp, 取带宽40Hz，控制)
     .vel_limit = 20000.0f * 6.0f,        // [degree/s]
     .acc_limit = 2000000.0f * 6.0f,      // [degree/s^2]
     .jerk_limit = 2000000.0f * 6.0f,     // [degree/s^3]

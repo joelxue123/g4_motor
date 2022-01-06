@@ -33,8 +33,8 @@ extern "C" {
 
 /* USER CODE BEGIN Private defines */
 #define TIM_CLOCK_DIVIDER 1
-#define PWM_PERIOD_CYCLES 8500
-#define DEAD_TIME_COUNTS 170
+#define PWM_PERIOD_CYCLES (8500)
+#define DEAD_TIME_COUNTS 85
 #define REP_COUNTER 0
 /* USER CODE END Private defines */
 

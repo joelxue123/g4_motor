@@ -123,7 +123,7 @@ static void _cbSendSystemDesc(void) {
   SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
 	SEGGER_SYSVIEW_SendSysDesc("I#34=ADC");
   SEGGER_SYSVIEW_SendSysDesc("I#24=EXIT2");
-  SEGGER_SYSVIEW_SendSysDesc("I#32=DMA1_5");
+  SEGGER_SYSVIEW_SendSysDesc("I#51=SPI1");
   SEGGER_SYSVIEW_SendSysDesc("I#33=DMA1_6");
   SEGGER_SYSVIEW_SendSysDesc("I#54=USART2");
 }

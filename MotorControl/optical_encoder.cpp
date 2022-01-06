@@ -161,7 +161,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
 
            if(hfi_state.hfi_time % 2000 == 0)
            {
-            int _offset =  (int)(config_.cpr / (4.0f * hfi_state.hfi_time / 2000) / motor_.config_.pole_pairs);
+            int _offset =  (int)((config_.cpr / motor_.config_.pole_pairs) * (hfi_state.hfi_time / 8000.0f));
             hfi_state.encvaluesum += count_in_cpr_ + turn_ * config_.cpr - _offset;
            }
 
@@ -169,7 +169,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
            {
              int _offset =  (int)(config_.cpr / motor_.config_.pole_pairs);
              int _delta_pos = count_in_cpr_ + turn_ * config_.cpr - hfi_state.start_pos - _offset;
-             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 30.0f || abs(_delta_pos) > _offset / 6)
+             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 10.0f || abs(_delta_pos) > _offset / 6)
              {
                 motor_.servo_off();
                 error_ = ERROR_ERROR_DIRECTION;
@@ -192,7 +192,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
            if(hfi_state.hfi_time % 2000 == 0)
            {
                int _offset1 =  (int)(config_.cpr / motor_.config_.pole_pairs);
-               int _offset2 =  (int)(config_.cpr / (4.0f * hfi_state.hfi_time / 2000) / motor_.config_.pole_pairs);
+               int _offset2 =  (int)((config_.cpr / motor_.config_.pole_pairs) * (hfi_state.hfi_time / 8000.0f));
                hfi_state.encvaluesum += count_in_cpr_ + turn_ * config_.cpr - _offset1 + _offset2;
            }
 
@@ -200,7 +200,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
            {
             int _offset =  (int)(config_.cpr / motor_.config_.pole_pairs);
              int _delta_pos = count_in_cpr_ + turn_ * config_.cpr - hfi_state.start_pos;  
-             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 30.0f || abs(_delta_pos) > _offset / 6)
+             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 10.0f || abs(_delta_pos) > _offset / 6)
              {
                 motor_.servo_off();
                 error_ = ERROR_ERROR_DIRECTION;

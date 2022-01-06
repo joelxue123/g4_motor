@@ -99,7 +99,7 @@ public:
 
     hfi_state_t hfi_state = {0};
 
-    const float current_meas_period = 0.0000625f;
+    const float current_meas_period = 5e-5f;
 };
 
 #endif

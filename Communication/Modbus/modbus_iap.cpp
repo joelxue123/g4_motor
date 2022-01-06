@@ -35,10 +35,9 @@ uint8_t IAP_Write06H(uint16_t reg_addr, uint16_t reg_value)
     switch (reg_addr)
     {
     case REG03_BOOT_UPGRADE_FLAG: /* 程序升级标志寄存器 */
-        if(reg_value)
+        if(reg_value == 1)
         {
             g_need_bootloader = 1;
-            //system_jump_booloader();
         }
         break;
         

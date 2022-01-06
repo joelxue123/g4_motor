@@ -210,8 +210,8 @@ void rotator_on_main(void)
 
     case 1:
         g_motor.config_.requested_current_range = 1.0f;
-        g_ctrl.trap_.config_.vel_limit = 18000.0f * 6.0f;
-        g_ctrl.config_.vel_limit = 18000.0f * 6.0f;
+        g_ctrl.trap_.config_.vel_limit = 5000.0f * 6.0f;
+        g_ctrl.config_.vel_limit = 5000.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = 1000000.0f * 6.0f + 20000.0f * 6.0f;
         g_ctrl.trap_.config_.decel_limit = 1000000.0f * 6.0f + 20000.0f * 6.0f;
 
@@ -401,10 +401,10 @@ void rotator_set_start_move(uint8_t mode)
     {
         rotator_gOBJ = 1;
         g_motor.config_.requested_current_range = (float)rotator_torque_set / 255.0f * 1.0f + 0.15f;
-        g_ctrl.trap_.config_.vel_limit = (float)rotator_vel_set / 255.0f * 17500.0f * 6.0f + 500.0f * 6.0f;
-        g_ctrl.config_.vel_limit = (float)rotator_vel_set / 255.0f * 17500.0f * 6.0f + 500.0f * 6.0f;
-        g_ctrl.trap_.config_.accel_limit = (float)rotator_torque_set / 255.0f * 980000.0f * 6.0f + 20000.0f * 6.0f;
-        g_ctrl.trap_.config_.decel_limit = (float)rotator_torque_set / 255.0f * 980000.0f * 6.0f + 20000.0f * 6.0f;
+        g_ctrl.trap_.config_.vel_limit = (float)rotator_vel_set / 255.0f * 9500.0f * 6.0f + 500.0f * 6.0f;
+        g_ctrl.config_.vel_limit = (float)rotator_vel_set / 255.0f * 9500.0f * 6.0f + 500.0f * 6.0f;
+        g_ctrl.trap_.config_.accel_limit = (float)rotator_torque_set / 255.0f * 180000.0f * 6.0f + 20000.0f * 6.0f;
+        g_ctrl.trap_.config_.decel_limit = (float)rotator_torque_set / 255.0f * 180000.0f * 6.0f + 20000.0f * 6.0f;
         //float dis_all = left_rotator_zero_encoder - right_rotator_zero_encoder;
         float pos = 0.0f;
         if(mode == 1)
