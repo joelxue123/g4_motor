@@ -33,8 +33,14 @@ else ()
     add_compile_options(-Og -g -gdwarf-2)
 endif ()
 
-include_directories(MotorControl/
+include_directories(APP/
+                    MotorControl/
+                    NVM/
+                    Communication/Modbus/
                     Board/ERG26/Inc
+                    Board/ERG26/EEPROM_Emul/Core/
+                    Board/ERG26/EEPROM_Emul/Porting/STM32G4
+                    ThirdParty/SystemViewer
                     ThirdParty/STM32G4xx_HAL_Driver/Inc
                     ThirdParty/STM32G4xx_HAL_Driver/Inc/Legacy
                     ThirdParty/CMSIS/DSP/Include
@@ -44,7 +50,10 @@ include_directories(MotorControl/
 add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx -DFPU_FPV4 -DUSER_VECT_TAB_ADDRESS)
 
 file(GLOB_RECURSE SOURCES 
-    "Board/ERG26/*.*" 
+    "APP/*.*"
+    "NVM/*.*"
+    "Communication/*.*"
+    "Board/*.*" 
     "ThirdParty/*.*"
     "MotorControl/*.*"
     "${STARTUP_FILE}")

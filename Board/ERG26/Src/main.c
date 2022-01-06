@@ -29,13 +29,19 @@
 #include "opamp.h"
 #include "spi.h"
 #include "stm32g4xx_hal.h"
+#include "stm32g4xx_hal_flash.h"
+#include "stm32g4xx_hal_rcc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "eeprom_emul.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stspin32g4.h"
+#ifdef SYSVIEW_DEBUG
+#include "SEGGER_SYSVIEW.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +57,7 @@ STSPIN32G4_statusTypeDef g_spin_status;
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define G4_BOOTLOADER_ADDRESS 0x801C000
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -74,6 +80,8 @@ void JumpToAddress(uint32_t Address)
   Function_Pointer jump_to_address;
 
   /* Deinitialize all HW resources used by the Bootloader to their reset values */
+  HAL_RCC_DeInit();
+  HAL_MspDeInit();
   HAL_DeInit();
 
   /* Enable IRQ */
@@ -100,7 +108,7 @@ void JumpToAddress(uint32_t Address)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  EE_Status ee_status = EE_OK;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -136,9 +144,17 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* Initialize interrupts */
+#ifdef SYSVIEW_DEBUG
+  SEGGER_SYSVIEW_Conf();
+#endif
+
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  JumpToAddress(G4_BOOTLOADER_ADDRESS);
+  HAL_FLASH_Unlock();
+  ee_status = EE_Init(EE_CONDITIONAL_ERASE);
+  HAL_FLASH_Lock();
+  //if(ee_status != EE_OK) {Error_Handler();}
+
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
   main_setup();
@@ -150,7 +166,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    STSPIN32G4_getStatus(&hdlG4, &g_spin_status);
+    //STSPIN32G4_getStatus(&hdlG4, &g_spin_status);
     main_loop();
     /* USER CODE BEGIN 3 */
   }

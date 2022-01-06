@@ -61,14 +61,14 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define G4_BOOTLOADER_ADDRESS 0x801C000
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void JumpToAddress(uint32_t Address);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

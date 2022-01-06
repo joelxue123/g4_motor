@@ -2,6 +2,7 @@
 #define __OPTICALENCODER_HPP
 
 #include "interface.h"
+#include <stdint.h>
 
 class Motor;
 
@@ -24,14 +25,15 @@ typedef struct{
 *** 光编管理类
 */
 class OpticalEncoder {
+public:
     enum Error_t {
         ERROR_NONE = 0,
         ERROR_UNSTABLE_GAIN = 0x01,
         ERROR_CPR_OUT_OF_RANGE = 0x02,
+        ERROR_ERROR_DIRECTION = 0x04,
         ERROR_INDEX_NOT_FOUND_YET = 0x20,
     };
 
-public:
     OpticalEncoder(optical_encoder_config_t& _config);
 
     bool  init();
@@ -40,7 +42,8 @@ public:
     bool update(int motor_pole_pairs, float __delta);
     void set_error(Error_t _error);
     void set_align();
-    bool calibrate_offset(Motor& motor_, float __delta);
+    bool calibrate_offset_rotator(Motor& motor_, float __delta);
+    bool calibrate_offset_clamper(Motor& motor_, float __delta);
 
     optical_encoder_config_t& config_;
     Error_t error_ = ERROR_NONE;
@@ -59,6 +62,8 @@ public:
     float vel_rpm_ = 0.0f;   // [rpm]
     float vel_abs_rpm_ = 0.0f;   // [rpm]
     float pos_degree_ = 0.0f; //[degree]
+    float pos_estimate_degree = 0.0f;
+    float vel_estimate_degree = 0.0f;
 
     /*
     ** 在没有保证光编码器的index信号有效的情况下
@@ -88,11 +93,13 @@ public:
         float         hfi_phase_offset;
         int           hfi_time;
         int           hfi_rst_delay;
+        int64_t       encvaluesum;
+        int32_t       start_pos;
     } hfi_state_t;
 
     hfi_state_t hfi_state = {0};
 
-    const float current_meas_period = 0.00005f;
+    const float current_meas_period = 0.0000625f;
 };
 
 #endif

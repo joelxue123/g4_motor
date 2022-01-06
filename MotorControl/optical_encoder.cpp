@@ -1,6 +1,7 @@
 #include "optical_encoder.hpp"
 #include "utils.hpp"
 #include "motor.hpp"
+#include <cmath>
 #include <math.h>
 
 OpticalEncoder::OpticalEncoder(optical_encoder_config_t& _config)
@@ -115,8 +116,10 @@ bool OpticalEncoder::update(int motor_pole_pairs, float __delta)
     float interpolated_enc = corrected_enc + interpolation_;
     vel_rpm_ = vel_estimate_ / ((float)__cpr) * 60.0f;
     vel_abs_rpm_ = fabsf(vel_rpm_);
-    //pos_degree_ = count_in_cpr_ / config_.cpr *360.0f;
     pos_degree_ = count_in_cpr_ / ((float)(__cpr)) * 360.0f;
+
+    pos_estimate_degree =  ((float)count_in_cpr_ / (float)(__cpr) + (float)(turn_)) * 360.0f;
+    vel_estimate_degree = (vel_estimate_ / (float)(__cpr)) * 360.0f;
     //// compute electrical phase
     //TODO avoid recomputing elec_rad_per_enc every time
     float elec_rad_per_enc = motor_pole_pairs * 2 * M_PI * (1.0f / (float)(__cpr));
@@ -126,14 +129,12 @@ bool OpticalEncoder::update(int motor_pole_pairs, float __delta)
     return true;
 }
 
-//拉D轴找启动角方式
-bool OpticalEncoder::calibrate_offset(Motor& motor_, float __delta)
+bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
 {   
     switch(hfi_state.hfi_step)
     {
        case 1:
         {
-            //motor_.servo_off();
             hfi_state.hfi_step++;
             motor_.servo_on();
             hfi_state.hfi_time = 0;
@@ -142,13 +143,12 @@ bool OpticalEncoder::calibrate_offset(Motor& motor_, float __delta)
        case 2:
        {
            hfi_state.hfi_time++;
-           //motor_.FOC_current(-0.5f, 0.0f, 0.0, 0.0f);
-           motor_.FOC_voltage(2.85f, 0.0f, 0.0f);
-           if(hfi_state.hfi_time >= 20000)
+           motor_.FOC_voltage(8.0f, 0.0f, 0.0f);
+           if(hfi_state.hfi_time >= 1000)
            {
-             config_.offset = count_in_cpr_;
-             config_.offset_float = -0.5f;
-             hfi_state.hfi_step = 4;
+             hfi_state.encvaluesum = count_in_cpr_ + turn_ * config_.cpr;
+             hfi_state.start_pos = count_in_cpr_ + turn_ * config_.cpr;
+             hfi_state.hfi_step = 3;
              hfi_state.hfi_time = 0;
            }
            break;
@@ -156,20 +156,65 @@ bool OpticalEncoder::calibrate_offset(Motor& motor_, float __delta)
        case 3:
        {
            hfi_state.hfi_time++;
-           float ph_ = (float)hfi_state.hfi_time / 10000.0f * 2 * M_PI;
-           motor_.FOC_current(0.1f, 0.0f, ph_, 0.0f);
-           //motor_.FOC_voltage(2.85f, 0.0f, ph_);
-           if(hfi_state.hfi_time >= 10000)
+           float ph_ = (float)hfi_state.hfi_time / 8000.0f * 2 * M_PI;
+           motor_.FOC_voltage(8.0f, 0.0f, ph_);
+
+           if(hfi_state.hfi_time % 2000 == 0)
            {
-             hfi_state.hfi_step = 3;
+            int _offset =  (int)(config_.cpr / (4.0f * hfi_state.hfi_time / 2000) / motor_.config_.pole_pairs);
+            hfi_state.encvaluesum += count_in_cpr_ + turn_ * config_.cpr - _offset;
+           }
+
+           if(hfi_state.hfi_time >= 8000)
+           {
+             int _offset =  (int)(config_.cpr / motor_.config_.pole_pairs);
+             int _delta_pos = count_in_cpr_ + turn_ * config_.cpr - hfi_state.start_pos - _offset;
+             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 30.0f || abs(_delta_pos) > _offset / 6)
+             {
+                motor_.servo_off();
+                error_ = ERROR_ERROR_DIRECTION;
+                return true;
+             }
+             
+             hfi_state.encvaluesum += count_in_cpr_ + turn_ * config_.cpr - _offset;
+             hfi_state.hfi_step = 4;
+             hfi_state.hfi_time = 0;
+           }
+
+           break;
+       }
+       case 4:
+       {
+           hfi_state.hfi_time++;
+           float ph_ = 2 * M_PI - (float)hfi_state.hfi_time/ 8000.0f * 2 * M_PI;
+           motor_.FOC_voltage(8.0f, 0.0f, ph_);
+
+           if(hfi_state.hfi_time % 2000 == 0)
+           {
+               int _offset1 =  (int)(config_.cpr / motor_.config_.pole_pairs);
+               int _offset2 =  (int)(config_.cpr / (4.0f * hfi_state.hfi_time / 2000) / motor_.config_.pole_pairs);
+               hfi_state.encvaluesum += count_in_cpr_ + turn_ * config_.cpr - _offset1 + _offset2;
+           }
+
+           if(hfi_state.hfi_time >= 8000)
+           {
+            int _offset =  (int)(config_.cpr / motor_.config_.pole_pairs);
+             int _delta_pos = count_in_cpr_ + turn_ * config_.cpr - hfi_state.start_pos;  
+             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 30.0f || abs(_delta_pos) > _offset / 6)
+             {
+                motor_.servo_off();
+                error_ = ERROR_ERROR_DIRECTION;
+                return true;
+             }
+             hfi_state.hfi_step = 5;
              hfi_state.hfi_time = 0;
            }
            break;
        }
-        case 4:
+        case 5:
         {
-            config_.offset = count_in_cpr_;
-            config_.offset_float = -0.5f;
+            config_.offset = hfi_state.encvaluesum / 10;
+            config_.offset_float = 0.0f;
             motor_.servo_off();
             hfi_state.hfi_step = 1;
             return true;
@@ -177,4 +222,89 @@ bool OpticalEncoder::calibrate_offset(Motor& motor_, float __delta)
     }
     return false;
 }
- 
+
+//拉D轴找启动角方式
+bool OpticalEncoder::calibrate_offset_clamper(Motor& motor_, float __delta)
+{   
+    switch(hfi_state.hfi_step)
+    {
+       case 1:
+        {
+            hfi_state.hfi_step++;
+            motor_.servo_on();
+            hfi_state.hfi_time = 0;
+            break;
+        }
+       case 2:
+       {
+           hfi_state.hfi_time++;
+           motor_.FOC_voltage(8.0f, 0.0f, 0.0f);
+           if(hfi_state.hfi_time >= 1000)
+           {
+             hfi_state.start_pos = count_in_cpr_ + turn_ * config_.cpr;
+             hfi_state.hfi_step = 3;
+             hfi_state.hfi_time = 0;
+           }
+           break;
+       }
+       case 3:
+       {
+           hfi_state.hfi_time++;
+           float ph_ = (float)hfi_state.hfi_time / 8000.0f * 2 * M_PI;
+           motor_.FOC_voltage(8.0f, 0.0f, ph_);
+
+           if(hfi_state.hfi_time >= 8000)
+           {
+             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 30.0f)
+             {
+                motor_.servo_off();
+                error_ = ERROR_ERROR_DIRECTION;
+                return true;
+             }
+
+             int _offset =  (int)(config_.cpr / motor_.config_.pole_pairs);
+             int delta_pos = count_in_cpr_ + turn_ * config_.cpr - hfi_state.start_pos - _offset;
+             
+             if(abs(delta_pos) > _offset / 6)
+             {
+                hfi_state.hfi_step = 4;
+                hfi_state.hfi_time = 0;
+             }
+             else {
+                hfi_state.hfi_step = 5;
+                hfi_state.hfi_time = 0;
+             }
+           }
+
+           break;
+       }
+       case 4:
+       {
+           hfi_state.hfi_time++;
+           float ph_ = 2 * M_PI - (float)hfi_state.hfi_time/ 8000.0f * 2 * M_PI;
+           motor_.FOC_voltage(8.0f, 0.0f, ph_);
+
+           if(hfi_state.hfi_time >= 8000)
+           {
+             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 30.0f)
+             {
+                motor_.servo_off();
+                error_ = ERROR_ERROR_DIRECTION;
+                return true;
+             }
+             hfi_state.hfi_step = 5;
+             hfi_state.hfi_time = 0;
+           }
+           break;
+       }
+        case 5:
+        {
+            config_.offset = count_in_cpr_;
+            config_.offset_float = 0.0f;
+            motor_.servo_off();
+            hfi_state.hfi_step = 1;
+            return true;
+        }
+    }
+    return false;
+}

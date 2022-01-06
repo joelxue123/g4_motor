@@ -42,12 +42,6 @@ void high_realtime_interrupt_init(void)
     STSPIN32G4_clearFaults( &hdlG4 );
    
     LL_TIM_GenerateEvent_CC4(TIM1);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1N);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3);
-    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
     LL_TIM_EnableAllOutputs(TIM1);
     LL_TIM_EnableCounter(TIM1);
     
@@ -69,13 +63,22 @@ void encoder_init(int __init_value, int __cpr)
 
 void motor_servo_on(int num)
 {
-    //LL_TIM_EnableAllOutputs(TIM1);
-    //HAL_GPIO_WritePin(PIN_EN_GATE_1_GPIO_Port, PIN_EN_GATE_1_Pin, GPIO_PIN_SET);
+    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1);
+    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH1N);
+    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2);
+    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
+    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3);
+    LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
 }
 
 void motor_servo_off(int num)
 {
-    //LL_TIM_DisableAllOutputs(TIM1);
+    LL_TIM_CC_DisableChannel(TIM1, LL_TIM_CHANNEL_CH1);
+    LL_TIM_CC_DisableChannel(TIM1, LL_TIM_CHANNEL_CH1N);
+    LL_TIM_CC_DisableChannel(TIM1, LL_TIM_CHANNEL_CH2);
+    LL_TIM_CC_DisableChannel(TIM1, LL_TIM_CHANNEL_CH2N);
+    LL_TIM_CC_DisableChannel(TIM1, LL_TIM_CHANNEL_CH3);
+    LL_TIM_CC_DisableChannel(TIM1, LL_TIM_CHANNEL_CH3N);
 }
 
 void motor_set_out_put(int num, uint32_t pha, uint32_t phb, uint32_t phc)
@@ -172,4 +175,9 @@ void system_delay_us(uint32_t us)
             asm volatile ("nop");
         }
     }
+}
+
+void system_jump_booloader(void)
+{
+    JumpToAddress(G4_BOOTLOADER_ADDRESS);
 }

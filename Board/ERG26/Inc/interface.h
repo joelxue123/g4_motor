@@ -28,6 +28,7 @@ extern volatile int g_pmsm_ib_org;
 extern volatile int g_pmsm_ia1_org;
 extern volatile int g_pmsm_ib1_org;
 extern volatile int g_bus_volt_org;
+extern volatile uint32_t g_fault_flag;
 
 extern volatile uint32_t g_encoder_value_org;
 extern volatile uint32_t g_encoder1_value_org;
@@ -63,7 +64,7 @@ void led_state_clr(void);
 void system_delay_ms(int ms);
 void system_delay_us(uint32_t us);
 void system_restart(void);
-
+void system_jump_booloader(void);
 #ifdef __cplusplus
  }
 #endif

@@ -46,7 +46,7 @@ void MX_TIM1_Init(void)
   TIM_InitStruct.Prescaler = ((TIM_CLOCK_DIVIDER) - 1);
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_CENTER_UP;
   TIM_InitStruct.Autoreload = ((PWM_PERIOD_CYCLES) / 2);
-  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV2;
+  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   TIM_InitStruct.RepetitionCounter = (REP_COUNTER);
   LL_TIM_Init(TIM1, &TIM_InitStruct);
   LL_TIM_DisableARRPreload(TIM1);
