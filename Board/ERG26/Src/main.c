@@ -151,9 +151,9 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   HAL_FLASH_Unlock();
-  ee_status = EE_Init(EE_CONDITIONAL_ERASE);
+  ee_status = EE_Init(EE_FORCED_ERASE);
   HAL_FLASH_Lock();
-  //if(ee_status != EE_OK) {Error_Handler();}
+  if(ee_status != EE_OK) {Error_Handler();}
 
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
