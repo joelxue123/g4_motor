@@ -117,7 +117,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  __enable_irq();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -141,7 +141,7 @@ int main(void)
   MX_CRC_Init();
   MX_FMAC_Init();
   MX_SPI1_Init();
-  MX_USART2_UART_Init();
+  //MX_USART2_UART_Init();
 
   /* Initialize interrupts */
 #ifdef SYSVIEW_DEBUG

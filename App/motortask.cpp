@@ -22,15 +22,15 @@
 
 bool MotorTask::on_init(void)
 {
-    //clamper_init();
-    rotator_init();
+    clamper_init();
+    //rotator_init();
     return true;
 }
 
 bool MotorTask::on_high_realtime_update(uint32_t _tick)
 {
-    //clamper_on_update();
-    rotator_on_update();
+    clamper_on_update();
+    //rotator_on_update();
     return true;
 }
 
@@ -41,13 +41,13 @@ bool MotorTask::on_realtime_update(uint32_t _tick)
 
 bool MotorTask::on_none_realtime_update(uint32_t _tick)
 {
-    //clamper_on_main();
-    rotator_on_main(); 
+    clamper_on_main();
+    //rotator_on_main(); 
     return true;
 }
 
 void MotorTask::on_exit(void)
 {
-    //clamper_set_torque(0);
-    rotator_set_torque(0);
+    clamper_set_torque(0);
+    //rotator_set_torque(0);
 }
