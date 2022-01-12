@@ -67,6 +67,14 @@ bool Communication::on_init(void)
 
 bool Communication::on_high_realtime_update(uint32_t _tick)
 {
+    g_clamper_status.StatusWord = clamper_get_status();
+    g_clamper_status.AbsPosition = clamper_spi_get_pos();
+    g_clamper_status.AbsVelocity = clamper_spi_get_vel();
+    g_clamper_status.AbsTorque = clamper_get_torque();
+    clamper_set_status(g_clamper_ctrl.ControlWord);
+    clamper_spi_set_vel(g_clamper_ctrl.AbsVelocity);
+    clamper_spi_set_torque(g_clamper_ctrl.AbsTorque);
+    clamper_spi_set_pos(g_clamper_ctrl.AbsPosition);
     return true;
 }
 
@@ -101,15 +109,6 @@ void Communication::on_data_recv(uint16_t Size)
         RX485_buf_Read_prt++;
         RX485_buf_Read_prt = RX485_buf_Read_prt % UART_RX_BUFFER_NUM;
     }
-
-    g_clamper_status.StatusWord = clamper_get_status();
-    g_clamper_status.AbsPosition = clamper_spi_get_pos();
-    g_clamper_status.AbsVelocity = clamper_spi_get_vel();
-    g_clamper_status.AbsTorque = clamper_get_torque();
-    clamper_set_status(g_clamper_ctrl.ControlWord);
-    clamper_spi_set_vel(g_clamper_ctrl.AbsVelocity);
-    clamper_spi_set_torque(g_clamper_ctrl.AbsTorque);
-    clamper_spi_set_pos(g_clamper_ctrl.AbsPosition);
 }
 
 void Communication::on_data_error(void)

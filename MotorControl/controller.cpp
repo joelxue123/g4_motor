@@ -209,6 +209,10 @@ bool Controller::update(OpticalEncoder& encoder_, float pos_feedbak, float& ret_
         pos_err = pos_setpoint_ - pos_feedbak;
         pos_err_ = pos_err;
         pos_abs_err_ = fabsf(pos_err);
+        if(pos_abs_err_ < 20.0f) 
+        {
+            pos_err = 0;
+        }
         vel_des += config_.pos_gain * pos_err;
     }
 
