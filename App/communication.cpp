@@ -60,7 +60,7 @@ bool Communication::on_init(void)
     memset(RX485_buf_Size, 0, UART_RX_BUFFER_NUM * 2);
     RX485_buf_Write_prt = 0;
     RX485_buf_Read_prt = 0;
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
 
     return true;
 }
@@ -81,7 +81,7 @@ bool Communication::on_none_realtime_update(uint32_t _tick)
     {
         uint8_t * recv_data_ptr = RX485_buf[RX485_buf_Read_prt];
         memcpy((void*)&g_clamper_ctrl, (void*)recv_data_ptr, sizeof(clamper_ctrl_t));
-        HAL_UART_Transmit_DMA(&huart1, (uint8_t*)&g_clamper_status, sizeof(clamper_status_t));
+        HAL_UART_Transmit_IT(&huart1, (uint8_t*)&g_clamper_status, sizeof(clamper_status_t));
         RX485_buf_Read_prt++;
         RX485_buf_Read_prt = RX485_buf_Read_prt % UART_RX_BUFFER_NUM;
     }
@@ -104,18 +104,18 @@ void Communication::on_data_recv(uint16_t Size)
 {
     if(Size != sizeof(clamper_ctrl_t))
     {
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
+        HAL_UARTEx_ReceiveToIdle_IT(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
         return;
     }
   
     RX485_buf_Size[RX485_buf_Write_prt] = Size;
     RX485_buf_Write_prt++;
     RX485_buf_Write_prt = RX485_buf_Write_prt % UART_RX_BUFFER_NUM;
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
 }
 
 void Communication::on_data_error(void)
 {
     HAL_UART_AbortReceive(&huart2);
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
 }
