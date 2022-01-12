@@ -38,14 +38,10 @@ function(CMSIS_CrossCompilingConfiguration)
     add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 
     #设置FPU,Target参数
-    if (FPU)
-        add_compile_definitions(ARM_MATH_CM4;ARM_MATH_MATRIX_CHECK;ARM_MATH_ROUNDING)
-        add_compile_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
-        add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
-    else()
-        add_compile_options(-mfloat-abi=soft)
-    endif()
-    
+    add_compile_definitions(__VFP_FP__)
+    add_compile_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
+    add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
+
     set(STARTUP_FILE "Startup/Gcc/*.*" CACHE STRING "global")
     #判断链接脚本是否存在
     if (NOT SECTIONS_SCRIPT_PATH)

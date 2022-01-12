@@ -115,13 +115,13 @@ void clamper_on_update(void)
         g_motor.FOC_current(_clamper_target_id, _clamper_target_iq, _phase, 0.0f);
 
         float abs_vel = fabs(g_optical_encoder.vel_rpm_);
-        if(abs_vel > 18500.0f)
+        if(abs_vel > 9000.0f)
         {
             clamper_vel_fb = 255;
         }
         else
         {
-            clamper_vel_fb = (uint8_t)(abs_vel / 18500.0f * 255.0f);
+            clamper_vel_fb = (uint8_t)(abs_vel / 9000.0f * 255.0f);
         }
 
         float abs_torque = fabs(g_motor.current_control_.Iq_measured);
@@ -166,8 +166,8 @@ void clamper_on_main(void)
 
     case 1:
         g_motor.config_.requested_current_range = 0.6f;
-        g_ctrl.trap_.config_.vel_limit = 10000.0f * 6.0f;
-        g_ctrl.config_.vel_limit = 10000.0f * 6.0f;
+        g_ctrl.trap_.config_.vel_limit = 9000.0f * 6.0f;
+        g_ctrl.config_.vel_limit = 9000.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = 2000000.0f * 6.0f;
         g_ctrl.trap_.config_.decel_limit = 2000000.0f * 6.0f;
 
@@ -400,7 +400,7 @@ void clamper_set_start_move(void)
         clamper_gOBJ = 1;
         g_motor.config_.requested_current_range = (float)clamper_torque_set / 255.0f * 0.45f + 0.15f;
         g_ctrl.trap_.config_.vel_limit = (float)clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
-        g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 9500.0f * 6.0f + 500.0f * 6.0f;
+        g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;
         g_ctrl.trap_.config_.decel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;
         float pos_ = (float)clamper_pos_set / 255.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
@@ -593,7 +593,7 @@ void clamper_spi_set_vel(uint8_t vel)
 {
     if(_clamper_status >= 6)
     {
-        g_ctrl.config_.vel_limit = (float) vel / 255.0f * 9500.0f * 6.0f + 500.0f * 6.0f;
+        g_ctrl.config_.vel_limit = (float) vel / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
     }
 }
 

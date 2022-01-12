@@ -8,7 +8,7 @@ error_time = 0
 # logging.basicConfig(filename='1.txt', level=logging.DEBUG)
 
 if __name__ == "__main__":
-    com_port = "COM21"
+    com_port = "COM7"
     station_id = 0xff
 
     client = ModbusClient(method='rtu', port=com_port,baudrate=115200, stopbits=1, bytesize=8, parity='N')

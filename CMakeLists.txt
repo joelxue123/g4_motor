@@ -48,7 +48,7 @@ include_directories(APP/
                     ThirdParty/CMSIS/Device/ST/STM32G4xx/Include
                     ThirdParty/CMSIS/Include)
 
-add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx -DFPU_FPV4 -DUSER_VECT_TAB_ADDRESS)
+add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx)
 
 file(GLOB_RECURSE SOURCES 
     "APP/*.*"
