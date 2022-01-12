@@ -250,12 +250,12 @@ bool OpticalEncoder::calibrate_offset_clamper(Motor& motor_, float __delta)
        case 3:
        {
            hfi_state.hfi_time++;
-           float ph_ = (float)hfi_state.hfi_time / 8000.0f * 2 * M_PI;
+           float ph_ = (float)hfi_state.hfi_time / 16000.0f * 2 * M_PI;
            motor_.FOC_voltage(8.0f, 0.0f, ph_);
 
-           if(hfi_state.hfi_time >= 8000)
+           if(hfi_state.hfi_time >= 16000)
            {
-             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 30.0f)
+             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 10.0f)
              {
                 motor_.servo_off();
                 error_ = ERROR_ERROR_DIRECTION;
@@ -286,7 +286,7 @@ bool OpticalEncoder::calibrate_offset_clamper(Motor& motor_, float __delta)
 
            if(hfi_state.hfi_time >= 8000)
            {
-             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 30.0f)
+             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 10.0f)
              {
                 motor_.servo_off();
                 error_ = ERROR_ERROR_DIRECTION;

@@ -97,7 +97,7 @@ void clamper_on_update(void)
 
     if(_clamper_status == 1 && g_motor.state_ == Motor::STATE_NORMAL)
     {
-        if(g_optical_encoder.calibrate_offset_clamper(g_motor, 1.0f))
+        if(g_optical_encoder.calibrate_offset_rotator(g_motor, 1.0f))
         {
             g_motor.servo_on();
             g_ctrl.reset();
@@ -166,8 +166,8 @@ void clamper_on_main(void)
 
     case 1:
         g_motor.config_.requested_current_range = 0.6f;
-        g_ctrl.trap_.config_.vel_limit = 20000.0f * 6.0f;
-        g_ctrl.config_.vel_limit = 20000.0f * 6.0f;
+        g_ctrl.trap_.config_.vel_limit = 10000.0f * 6.0f;
+        g_ctrl.config_.vel_limit = 10000.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = 2000000.0f * 6.0f;
         g_ctrl.trap_.config_.decel_limit = 2000000.0f * 6.0f;
 
@@ -177,8 +177,11 @@ void clamper_on_main(void)
     case 2:
         g_ctrl.reset();
         _tick_time = 0;
-        g_ctrl.set_current_setpoint(0.3f);
-        _clamper_status = 3;
+        //g_ctrl.set_current_setpoint(0.3f);
+        _open_limit_point = 60000;
+        _close_limit_point = 0;
+        _clamper_status = 6;
+        //_clamper_status = 3;
         break;
 
     case 3:
@@ -396,8 +399,8 @@ void clamper_set_start_move(void)
         clamper_gDrop = 0;
         clamper_gOBJ = 1;
         g_motor.config_.requested_current_range = (float)clamper_torque_set / 255.0f * 0.45f + 0.15f;
-        g_ctrl.trap_.config_.vel_limit = (float)clamper_vel_set / 255.0f * 17500.0f * 6.0f + 1000.0f * 6.0f;
-        g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 17500.0f * 6.0f + 1000.0f * 6.0f;
+        g_ctrl.trap_.config_.vel_limit = (float)clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
+        g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 9500.0f * 6.0f + 500.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;
         g_ctrl.trap_.config_.decel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;
         float pos_ = (float)clamper_pos_set / 255.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
@@ -539,38 +542,30 @@ uint16_t clamper_get_param(char type, uint16_t address)
 
 int8_t clamper_spi_get_vel(void)
 {
-    float _vel = g_optical_encoder.vel_rpm_;
-    int8_t _fb = 0;
-    if(_vel > 18000.0f)
+    float _vel = g_optical_encoder.vel_abs_rpm_;
+    uint8_t _fb = 0;
+    if(_vel > 10000.0f)
     {
-        _fb = 127;
+        _fb = 255;
     }
-    else if(_vel < -18000.0f) 
+    else 
     {
-        _fb = -127;
-    }
-    else
-    {
-        _fb = (int8_t)(_vel / 18000.0f * 127.0f);
+        _fb = (uint8_t)(_vel / 18000.0f * 255.0f);
     }
     return _fb;
 }
 
 int8_t clamper_spi_get_torque(void)
 {
-    float _torque = g_motor.current_control_.Iq_measured;
-    int8_t _fb = 0;
+    float _torque = g_motor.extern_torque;
+    uint8_t _fb = 0;
     if(_torque > 0.6f)
     {
-        _fb = 127;
-    }
-    else if(_torque < -0.6f) 
-    {
-        _fb = -127;
+        _fb = 255;
     }
     else
     {
-        _fb = (int8_t)(_torque / 0.6f * 127.0f);
+        _fb = (uint8_t)(_torque / 0.6f * 255.0f);
     }
     return _fb;
 }
@@ -580,7 +575,7 @@ int32_t clamper_spi_get_pos(void)
     int32_t pos = 0;
     if(g_ctrl.pos_estimate > _open_limit_point)
     {
-        pos = 65535;
+        pos = 255;
     }
     else if(g_ctrl.pos_estimate < _close_limit_point)
     {
@@ -596,20 +591,18 @@ int32_t clamper_spi_get_pos(void)
 
 void clamper_spi_set_vel(uint8_t vel)
 {
-    //g_ctrl.config_.vel_limit = 18500.0f;
-    //if(_clamper_status >= 6)
-    //{
-    //    g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 17500.0f * 6.0f + 1000.0f * 6.0f;
-    //}
+    if(_clamper_status >= 6)
+    {
+        g_ctrl.config_.vel_limit = (float) vel / 255.0f * 9500.0f * 6.0f + 500.0f * 6.0f;
+    }
 }
 
 void clamper_spi_set_torque(uint8_t torque)
 {
-    //g_motor.config_.requested_current_range = 0.6f;
-    //if(_clamper_status >= 6)
-    //{
-    //    g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.45f + 0.15f;
-    //}
+    if(_clamper_status >= 6)
+    {
+        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.45f + 0.15f;
+    }
 }
 
 void clamper_spi_set_pos(int32_t pos)
@@ -617,9 +610,9 @@ void clamper_spi_set_pos(int32_t pos)
     if(_clamper_status >= 6)
     {
         if(pos < 0) pos = 0;
-        if(pos > 65535) pos = 65535;
+        if(pos > 255) pos = 255;
 
-        float pos_ = (float)pos / 65535.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
+        float pos_ = (float)pos / 255.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
         g_ctrl.set_pos_setpoint(pos_, 0.0f, 0.0f);
     }
 }

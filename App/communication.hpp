@@ -19,15 +19,33 @@
 
 #include "taskmanager.hpp"
 
-#define UART_RX_BUFFER_SIZE 512
+#define UART_RX_BUFFER_SIZE 64
 #define UART_RX_BUFFER_NUM  8
 
+
+typedef struct {
+uint8_t ControlWord; /* Subindex1 - controlWord */
+int32_t AbsPosition; /* Subindex3 - adbPosition */
+uint8_t AbsVelocity; /* Subindex4 - absVelocity */
+uint8_t AbsTorque; /* Subindex6 - absTorque */
+uint8_t boot_flag;
+} clamper_ctrl_t;
+
+extern clamper_ctrl_t g_clamper_ctrl;
+
+typedef struct{
+uint8_t StatusWord; /* Subindex1 - statusWord */
+uint8_t ErrCode; /* Subindex2 - errCode */
+int32_t AbsPosition; /* Subindex3 - absPosition */
+uint8_t AbsVelocity; /* Subindex4 - absVelocity */
+uint8_t AbsTorque; /* Subindex5 - absTorque */
+} clamper_status_t;
+
+extern clamper_status_t g_clamper_status;
 class Communication : public TaskManager
 {
     public:
         Communication(void){
-            station_address = 0;
-            RX485_flag = 0;
             _instance = this;
         };
         ~Communication(void){};
@@ -48,8 +66,6 @@ class Communication : public TaskManager
         
 
     private:
-        uint32_t  station_address = 0;
-        uint8_t  RX485_flag = 0;
         uint8_t  RX485_buf[UART_RX_BUFFER_NUM][UART_RX_BUFFER_SIZE] = {0};
         uint16_t RX485_buf_Size[UART_RX_BUFFER_NUM] = {0};
         uint32_t RX485_buf_Write_prt = 0;
