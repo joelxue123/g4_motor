@@ -20,7 +20,7 @@
 #include "taskmanager.hpp"
 
 #define UART_RX_BUFFER_SIZE 64
-#define UART_RX_BUFFER_NUM  8
+#define UART_RX_BUFFER_NUM  2
 
 
 typedef struct {

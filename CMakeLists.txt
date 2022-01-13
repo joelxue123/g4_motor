@@ -41,6 +41,7 @@ include_directories(APP/
                     Board/ERG26/Inc
                     Board/ERG26/EEPROM_Emul/Core/
                     Board/ERG26/EEPROM_Emul/Porting/STM32G4
+                    ThirdParty/TinyFrame
                     ThirdParty/SystemViewer
                     ThirdParty/STM32G4xx_HAL_Driver/Inc
                     ThirdParty/STM32G4xx_HAL_Driver/Inc/Legacy

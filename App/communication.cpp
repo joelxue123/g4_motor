@@ -25,19 +25,13 @@
 extern "C"
 {
     #include "eeprom_emul.h"
+    #include "TinyFrame.h"
 }
 
 Communication * Communication::_instance = nullptr;
 clamper_ctrl_t g_clamper_ctrl = {0};
 clamper_status_t g_clamper_status = {0};
-
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef* phuart_)
-{
-  if(phuart_ == &huart1)
-  {
-
-  }
-}
+TinyFrame g_tiny_frame = {0};
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef* phuart_)
 {
@@ -55,8 +49,19 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef* phuart_, uint16_t Size)
   }
 }
 
+TF_Result replyListener(TinyFrame *tf, TF_Msg *msg)
+{
+   memcpy(&g_clamper_ctrl, msg->data, msg->len);
+   msg->data = (const uint8_t *)&g_clamper_status;
+   msg->len = sizeof(clamper_status_t);
+   TF_Respond(tf, msg);
+   return TF_STAY;
+}
+
 bool Communication::on_init(void)
 {
+    TF_InitStatic(&g_tiny_frame, TF_SLAVE);
+    TF_AddTypeListener(&g_tiny_frame, 1, replyListener);
     memset(RX485_buf_Size, 0, UART_RX_BUFFER_NUM * 2);
     RX485_buf_Write_prt = 0;
     RX485_buf_Read_prt = 0;
@@ -89,13 +94,7 @@ bool Communication::on_none_realtime_update(uint32_t _tick)
 }
 
 void Communication::on_data_recv(uint16_t Size)
-{
-    if(Size != sizeof(clamper_ctrl_t))
-    {
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
-        return;
-    }
-  
+{ 
     RX485_buf_Size[RX485_buf_Write_prt] = Size;
     RX485_buf_Write_prt++;
     RX485_buf_Write_prt = RX485_buf_Write_prt % UART_RX_BUFFER_NUM;
@@ -104,8 +103,7 @@ void Communication::on_data_recv(uint16_t Size)
     if(RX485_buf_Write_prt != RX485_buf_Read_prt)
     {
         uint8_t * recv_data_ptr = RX485_buf[RX485_buf_Read_prt];
-        memcpy((void*)&g_clamper_ctrl, (void*)recv_data_ptr, sizeof(clamper_ctrl_t));
-        HAL_UART_Transmit_DMA(&huart1, (uint8_t*)&g_clamper_status, sizeof(clamper_status_t));
+        TF_Accept(&g_tiny_frame, recv_data_ptr, Size);
         RX485_buf_Read_prt++;
         RX485_buf_Read_prt = RX485_buf_Read_prt % UART_RX_BUFFER_NUM;
     }
