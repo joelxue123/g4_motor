@@ -35,7 +35,7 @@ extern clamper_ctrl_t g_clamper_ctrl;
 
 typedef struct{
 uint8_t StatusWord; /* Subindex1 - statusWord */
-uint8_t ErrCode; /* Subindex2 - errCode */
+uint8_t is_boot; /* Subindex2 - errCode */
 int32_t AbsPosition; /* Subindex3 - absPosition */
 uint8_t AbsVelocity; /* Subindex4 - absVelocity */
 uint8_t AbsTorque; /* Subindex5 - absTorque */
