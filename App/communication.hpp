@@ -25,21 +25,21 @@
 
 typedef struct {
 uint8_t ControlWord; /* Subindex1 - controlWord */
-int32_t AbsPosition; /* Subindex3 - adbPosition */
+uint8_t AbsPosition; /* Subindex3 - adbPosition */
 uint8_t AbsVelocity; /* Subindex4 - absVelocity */
 uint8_t AbsTorque; /* Subindex6 - absTorque */
-uint8_t boot_flag;
-} clamper_ctrl_t;
+uint32_t boot_flag;
+} clamper_ctrl_t __attribute__ ((aligned (1)));
 
 extern clamper_ctrl_t g_clamper_ctrl;
 
 typedef struct{
 uint8_t StatusWord; /* Subindex1 - statusWord */
-uint8_t is_boot; /* Subindex2 - errCode */
-int32_t AbsPosition; /* Subindex3 - absPosition */
+uint8_t AbsPosition; /* Subindex3 - absPosition */
 uint8_t AbsVelocity; /* Subindex4 - absVelocity */
 uint8_t AbsTorque; /* Subindex5 - absTorque */
-} clamper_status_t;
+uint32_t is_boot; /* Subindex2 - errCode */
+} clamper_status_t __attribute__ ((aligned (1)));
 
 extern clamper_status_t g_clamper_status;
 class Communication : public TaskManager
