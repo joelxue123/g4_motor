@@ -177,11 +177,11 @@ void clamper_on_main(void)
     case 2:
         g_ctrl.reset();
         _tick_time = 0;
-        //g_ctrl.set_current_setpoint(0.3f);
-        _open_limit_point = 60000;
-        _close_limit_point = 0;
-        _clamper_status = 6;
-        //_clamper_status = 3;
+        g_ctrl.set_current_setpoint(0.3f);
+        //_open_limit_point = 60000;
+        //_close_limit_point = 0;
+        //_clamper_status = 6;
+        _clamper_status = 3;
         break;
 
     case 3:
