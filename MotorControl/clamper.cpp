@@ -97,7 +97,7 @@ void clamper_on_update(void)
 
     if(_clamper_status == 1 && g_motor.state_ == Motor::STATE_NORMAL)
     {
-        if(g_optical_encoder.calibrate_offset_rotator(g_motor, 1.0f))
+        if(g_optical_encoder.calibrate_offset_clamper(g_motor, 1.0f))
         {
             g_motor.servo_on();
             g_ctrl.reset();
@@ -165,7 +165,7 @@ void clamper_on_main(void)
         break;
 
     case 1:
-        g_motor.config_.requested_current_range = 0.6f;
+        g_motor.config_.requested_current_range = 0.5f;
         g_ctrl.trap_.config_.vel_limit = 9000.0f * 6.0f;
         g_ctrl.config_.vel_limit = 9000.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = 2000000.0f * 6.0f;
@@ -398,7 +398,7 @@ void clamper_set_start_move(void)
     {
         clamper_gDrop = 0;
         clamper_gOBJ = 1;
-        g_motor.config_.requested_current_range = (float)clamper_torque_set / 255.0f * 0.45f + 0.15f;
+        g_motor.config_.requested_current_range = (float)clamper_torque_set / 255.0f * 0.35f + 0.15f;
         g_ctrl.trap_.config_.vel_limit = (float)clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
         g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
         g_ctrl.trap_.config_.accel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;

@@ -239,65 +239,14 @@ bool OpticalEncoder::calibrate_offset_clamper(Motor& motor_, float __delta)
        {
            hfi_state.hfi_time++;
            motor_.FOC_voltage(8.0f, 0.0f, 0.0f);
-           if(hfi_state.hfi_time >= 1000)
+           if(hfi_state.hfi_time >= 20000)
            {
-             hfi_state.start_pos = count_in_cpr_ + turn_ * config_.cpr;
              hfi_state.hfi_step = 3;
              hfi_state.hfi_time = 0;
            }
            break;
        }
-       case 3:
-       {
-           hfi_state.hfi_time++;
-           float ph_ = (float)hfi_state.hfi_time / 16000.0f * 2 * M_PI;
-           motor_.FOC_voltage(8.0f, 0.0f, ph_);
-
-           if(hfi_state.hfi_time >= 16000)
-           {
-             if(vel_rpm_ < 0.0f || vel_abs_rpm_ < 10.0f)
-             {
-                motor_.servo_off();
-                error_ = ERROR_ERROR_DIRECTION;
-                return true;
-             }
-
-             int _offset =  (int)(config_.cpr / motor_.config_.pole_pairs);
-             int delta_pos = count_in_cpr_ + turn_ * config_.cpr - hfi_state.start_pos - _offset;
-             
-             if(abs(delta_pos) > _offset / 6)
-             {
-                hfi_state.hfi_step = 4;
-                hfi_state.hfi_time = 0;
-             }
-             else {
-                hfi_state.hfi_step = 5;
-                hfi_state.hfi_time = 0;
-             }
-           }
-
-           break;
-       }
-       case 4:
-       {
-           hfi_state.hfi_time++;
-           float ph_ = 2 * M_PI - (float)hfi_state.hfi_time/ 16000.0f * 2 * M_PI;
-           motor_.FOC_voltage(8.0f, 0.0f, ph_);
-
-           if(hfi_state.hfi_time >= 16000)
-           {
-             if(vel_rpm_ > 0.0f || vel_abs_rpm_ < 10.0f)
-             {
-                motor_.servo_off();
-                error_ = ERROR_ERROR_DIRECTION;
-                return true;
-             }
-             hfi_state.hfi_step = 5;
-             hfi_state.hfi_time = 0;
-           }
-           break;
-       }
-        case 5:
+        case 3:
         {
             config_.offset = count_in_cpr_;
             config_.offset_float = 0.0f;

@@ -48,7 +48,7 @@ motor_config_t g_motor_config =
     .phase_inductance = 0.33e-3f,               // 电机相电感，初始值为电机厂给定值，可通过程序测定，单位[H]
     .phase_resistance = 11.5f,                  // 电机相电组，初始值为电机厂给定值，可通过程序测定，单位[Ω]
     .adc_current_k = 3.3f / 4096.0f / 0.02f / 21.0f,        //单位 安培每AD值
-    .current_lim = 2.5f,                      // 可测的最大电流值范围，单位[A]
+    .current_lim = 1.2f,                      // 可测的最大电流值范围，单位[A]
     .requested_current_range = 0.6f,          // 最大输入电流范围，单位[A]
     .current_control_bandwidth = 1200,  // [rad/s]
 };
