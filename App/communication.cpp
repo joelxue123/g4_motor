@@ -99,6 +99,13 @@ bool Communication::on_realtime_update(uint32_t _tick)
 
 bool Communication::on_none_realtime_update(uint32_t _tick)
 {
+    if(RX485_buf_Write_prt != RX485_buf_Read_prt)
+    {
+        uint8_t * recv_data_ptr = RX485_buf[RX485_buf_Read_prt];
+        TF_Accept(&g_tiny_frame, recv_data_ptr, Size);
+        RX485_buf_Read_prt++;
+        RX485_buf_Read_prt = RX485_buf_Read_prt % UART_RX_BUFFER_NUM;
+    }
     return true;
 }
 
@@ -108,14 +115,6 @@ void Communication::on_data_recv(uint16_t Size)
     RX485_buf_Write_prt++;
     RX485_buf_Write_prt = RX485_buf_Write_prt % UART_RX_BUFFER_NUM;
     HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RX485_buf[RX485_buf_Write_prt], UART_RX_BUFFER_SIZE);
-
-    if(RX485_buf_Write_prt != RX485_buf_Read_prt)
-    {
-        uint8_t * recv_data_ptr = RX485_buf[RX485_buf_Read_prt];
-        TF_Accept(&g_tiny_frame, recv_data_ptr, Size);
-        RX485_buf_Read_prt++;
-        RX485_buf_Read_prt = RX485_buf_Read_prt % UART_RX_BUFFER_NUM;
-    }
 }
 
 void Communication::on_data_error(void)
