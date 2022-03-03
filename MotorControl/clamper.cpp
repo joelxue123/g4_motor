@@ -198,7 +198,7 @@ void clamper_on_main(void)
         if(_tick_time >= 40)
         {
             g_ctrl.set_current_setpoint(0.0f);
-            _open_limit_point = g_ctrl.pos_estimate - 800.0f;
+            _open_limit_point = g_ctrl.pos_estimate - 200.0f;
             _clamper_status = 4;
         }
         break;
@@ -224,7 +224,7 @@ void clamper_on_main(void)
         if(_tick_time >= 40)
         {
             g_ctrl.set_current_setpoint(0.0f);
-            _close_limit_point = g_ctrl.pos_estimate + 800.0f;
+            _close_limit_point = g_ctrl.pos_estimate + 200.0f;
             __disable_irq();
             g_ctrl.reset();
             g_motor.reset_current_control();
@@ -559,13 +559,13 @@ int8_t clamper_spi_get_torque(void)
 {
     float _torque = g_motor.extern_torque;
     uint8_t _fb = 0;
-    if(_torque > 0.6f)
+    if(_torque > 0.5f)
     {
         _fb = 255;
     }
     else
     {
-        _fb = (uint8_t)(_torque / 0.6f * 255.0f);
+        _fb = (uint8_t)(_torque / 0.5f * 255.0f);
     }
     return _fb;
 }
@@ -601,7 +601,7 @@ void clamper_spi_set_torque(uint8_t torque)
 {
     if(_clamper_status >= 6)
     {
-        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.45f + 0.15f;
+        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.35f + 0.15f;
     }
 }
 
