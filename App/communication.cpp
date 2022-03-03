@@ -102,7 +102,7 @@ bool Communication::on_none_realtime_update(uint32_t _tick)
     if(RX485_buf_Write_prt != RX485_buf_Read_prt)
     {
         uint8_t * recv_data_ptr = RX485_buf[RX485_buf_Read_prt];
-        TF_Accept(&g_tiny_frame, recv_data_ptr, Size);
+        TF_Accept(&g_tiny_frame, recv_data_ptr, RX485_buf_Size[RX485_buf_Write_prt]);
         RX485_buf_Read_prt++;
         RX485_buf_Read_prt = RX485_buf_Read_prt % UART_RX_BUFFER_NUM;
     }
