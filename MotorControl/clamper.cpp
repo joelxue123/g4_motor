@@ -55,9 +55,7 @@ void clamper_init(void)
 
 uint8_t clamper_get_status(void)
 {
-    uint8_t _ret_status = clamper_gACT | (clamper_gDrop << 1);
-    _ret_status |= (clamper_gSTA << 3);
-    _ret_status |= (clamper_gOBJ << 5);
+    uint8_t _ret_status = _clamper_status;
     return _ret_status;
 }
 
@@ -134,7 +132,7 @@ void clamper_on_main(void)
     case 4:
         g_ctrl.reset();
         _tick_time = 0;
-         g_ctrl.set_vel_setpoint(-5000.0f, -0.3f);
+        g_ctrl.set_vel_setpoint(-5000.0f, -0.3f);
         _clamper_status = 5;
         break;
 
@@ -165,66 +163,6 @@ void clamper_on_main(void)
     case 6:
         _tick_time = 0;
         break;
-    
-    case 7:
-        clamper_gOBJ = 3;
-        if((g_ctrl.mode_ == Controller::CTRL_MODE_POSITION_CONTROL)
-            && (g_optical_encoder.vel_abs_rpm_ > 60.0f))
-        {
-            _clamper_status = 8;
-            clamper_gDrop = 1;
-        }
-        break;
-
-    case 17:
-        clamper_gOBJ = 2;
-        if((g_ctrl.mode_ == Controller::CTRL_MODE_POSITION_CONTROL)
-            && (g_optical_encoder.vel_abs_rpm_ > 60.0f))
-        {
-            _clamper_status = 18;
-        }
-        break;
-
-    case 8:
-        clamper_gOBJ = 1;
-        if(g_ctrl.mode_ == Controller::CTRL_MODE_POSITION_CONTROL
-           && g_ctrl.pos_abs_err_ < 120.0f)
-        {
-            _clamper_status = 9;
-        }
-
-        if((g_ctrl.mode_ == Controller::CTRL_MODE_POSITION_CONTROL
-            && g_motor.extern_torque > g_motor.config_.requested_current_range * 0.8f)
-            && (g_optical_encoder.vel_abs_rpm_ < 60.0f))
-        {
-            _clamper_status = 7;
-            clamper_gDrop = 0;
-        }
-        break;
-
-    case 18:
-        clamper_gOBJ = 1;
-        if(g_ctrl.mode_ == Controller::CTRL_MODE_POSITION_CONTROL
-           && g_ctrl.pos_abs_err_ < 60.0f)
-        {
-            _clamper_status = 19;
-        }
-
-        if((g_ctrl.mode_ == Controller::CTRL_MODE_POSITION_CONTROL
-            && g_motor.extern_torque > g_motor.config_.requested_current_range * 0.8f)
-            && (g_optical_encoder.vel_abs_rpm_ < 60.0f))
-        {
-            _clamper_status = 17;
-        }
-        break;
-
-    case 9:
-        clamper_gOBJ = 5;
-        break;
-
-    case 19:
-        clamper_gOBJ = 4;
-        break;
 
     case 11:
         g_motor.error_ = Motor::ERROR_NONE;
@@ -240,23 +178,6 @@ void clamper_on_main(void)
     if(g_motor.error_ != Motor::ERROR_NONE)
     {
         _clamper_status = 10;
-    }
-
-    if(_clamper_status < 7)
-    {
-        clamper_gOBJ = 0;
-    }
-
-    if(_clamper_status < 6 && _clamper_status > 0)
-    {
-        clamper_gSTA = 1;
-    }
-    else if(_clamper_status == 10 || _clamper_status == 0)
-    {
-        clamper_gSTA = 0;
-    }
-    else {
-        clamper_gSTA = 3;
     }
 }
 
@@ -345,7 +266,7 @@ int32_t clamper_spi_get_pos(void)
     {
         pos = (int32_t)((g_ctrl.pos_estimate - _close_limit_point) / (_open_limit_point - _close_limit_point) * 65535.0f);
     }
-    
+    pos = 255 - pos;
     return pos;
 }
 
