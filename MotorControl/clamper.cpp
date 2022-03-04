@@ -68,7 +68,7 @@ void clamper_on_update(void)
 
     if(_clamper_status == 1 && g_motor.state_ == Motor::STATE_NORMAL)
     {
-        if(g_optical_encoder.calibrate_offset_rotator(g_motor, 1.0f))
+        if(g_optical_encoder.calibrate_offset_clamper(g_motor, 1.0f))
         {
             g_motor.servo_on();
             g_ctrl.reset();
@@ -100,7 +100,7 @@ void clamper_on_main(void)
         break;
 
     case 1:
-        g_motor.config_.requested_current_range = 0.5f;
+        g_motor.config_.requested_current_range = 0.6f;
         g_ctrl.config_.vel_limit = 9000.0f * 6.0f;
 
         g_motor.reset_current_control();
@@ -109,13 +109,13 @@ void clamper_on_main(void)
     case 2:
         g_ctrl.reset();
         _tick_time = 0;
-        g_ctrl.set_vel_setpoint(5000.0f, 0.4f);
-        _clamper_status = 2;
+        g_ctrl.set_vel_setpoint(5000.0f, 0.3f);
+        _clamper_status = 3;
         break;
 
     case 3:
         if(g_motor.current_control_.Iq_measured >= 0.1f
-           && g_optical_encoder.vel_rpm_ < 10.0f)
+           && g_optical_encoder.vel_rpm_ < 100.0f)
         {
             _tick_time++;
         }
@@ -134,13 +134,13 @@ void clamper_on_main(void)
     case 4:
         g_ctrl.reset();
         _tick_time = 0;
-         g_ctrl.set_vel_setpoint(-5000.0f, -0.4f);
+         g_ctrl.set_vel_setpoint(-5000.0f, -0.3f);
         _clamper_status = 5;
         break;
 
     case 5:
         if(g_motor.current_control_.Iq_measured <= -0.1f
-           && g_optical_encoder.vel_rpm_ > -10.0f)
+           && g_optical_encoder.vel_rpm_ > -60.0f)
         {
             _tick_time++;
         }
