@@ -11,15 +11,6 @@
 #include <math.h>
 #include "stm32g431xx.h"
 
-extern "C"
-{
-    #include "eeprom_emul.h"
-}
-
-#define NVM_CLAMPER_DATA_ADDRESS (33)
-
-clamper_param_t clamper_params[8] = {0};
-
 uint8_t _clamper_status = 0;
 float _clamper_target_iq = 0.0f;
 float _clamper_target_id = 0.0f;
@@ -60,13 +51,6 @@ void clamper_init(void)
     _close_limit_point = 0.0f;
 
     _tick_time = 0;
-
-    clamper_vel_set = 255;
-    clamper_vel_fb = 0;
-    clamper_pos_set = 0;
-    clamper_pos_fb = 0;
-    clamper_torque_set = 255;
-    clamper_torque_fb = 0;
 }
 
 uint8_t clamper_get_status(void)
@@ -84,7 +68,7 @@ void clamper_on_update(void)
 
     if(_clamper_status == 1 && g_motor.state_ == Motor::STATE_NORMAL)
     {
-        if(g_optical_encoder.calibrate_offset_clamper(g_motor, 1.0f))
+        if(g_optical_encoder.calibrate_offset_rotator(g_motor, 1.0f))
         {
             g_motor.servo_on();
             g_ctrl.reset();
@@ -100,42 +84,6 @@ void clamper_on_update(void)
         float _pos_encoder = g_ctrl.pos_estimate;
         g_ctrl.update(g_optical_encoder, _pos_encoder, _clamper_target_iq, g_motor.config_.requested_current_range);
         g_motor.FOC_current(_clamper_target_id, _clamper_target_iq, _phase, 0.0f);
-
-        float abs_vel = fabsf(g_optical_encoder.vel_rpm_);
-        if(abs_vel > 9000.0f)
-        {
-            clamper_vel_fb = 255;
-        }
-        else
-        {
-            clamper_vel_fb = (uint8_t)(abs_vel / 9000.0f * 255.0f);
-        }
-
-        float abs_torque = fabsf(g_motor.current_control_.Iq_measured);
-        if(abs_torque > 0.6f)
-        {
-            clamper_torque_fb = 255;
-        }
-        else
-        {
-            clamper_torque_fb = (uint8_t)(abs_torque / 0.6f * 255.0f);
-        }
-    }
-
-    if(_clamper_status >= 6)
-    {
-        if(g_ctrl.pos_estimate > _open_limit_point)
-        {
-            clamper_pos_fb = 255;
-        }
-        else if(g_ctrl.pos_estimate < _close_limit_point)
-        {
-            clamper_pos_fb = 0;
-        }
-        else
-        {
-            clamper_pos_fb = (uint8_t)((g_ctrl.pos_estimate - _close_limit_point) / (_open_limit_point - _close_limit_point) * 255.0f);
-        }
     }
 }
 
@@ -208,7 +156,7 @@ void clamper_on_main(void)
             __disable_irq();
             g_ctrl.reset();
             g_motor.reset_current_control();
-            g_ctrl.move_to_pos(_open_limit_point,  g_ctrl.pos_estimate);
+            g_ctrl.set_pos_setpoint(_open_limit_point, 0.0f, 0.0f);
             _clamper_status = 6;
             __enable_irq();
         }
@@ -343,11 +291,6 @@ void clamper_set_status(uint8_t status)
         _clamper_status = 0;
     }
 
-    if(_rGTO == 1)
-    {
-        //clamper_set_start_move();
-    }
-
     if(_rstop == 1)
     {
         _clamper_stop_move();
@@ -355,36 +298,6 @@ void clamper_set_status(uint8_t status)
 
     clamper_last_rACT = _rACT;
     clamper_last_rGTO = _rGTO;
-}
-
-void clamper_set_vel(uint8_t vel)
-{
-    clamper_vel_set = vel;
-}
-
-void clamper_set_torque(uint8_t torque)
-{
-    clamper_torque_set = torque;
-}
-
-void clamper_set_pos(uint8_t pos)
-{
-    clamper_pos_set = 0xFF - pos;
-}
-
-uint8_t clamper_get_vel(void)
-{
-    return clamper_vel_fb;
-}
-
-uint8_t clamper_get_torque(void)
-{
-    return clamper_torque_fb;
-}
-
-uint8_t clamper_get_pos(void)
-{
-    return (0xFF - clamper_pos_fb);
 }
 
 int8_t clamper_spi_get_vel(void)
@@ -458,7 +371,7 @@ void clamper_spi_set_pos(int32_t pos)
     {
         if(pos < 0) pos = 0;
         if(pos > 255) pos = 255;
-
+        pos = 255 - pos;
         float pos_ = (float)pos / 255.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
         g_ctrl.set_pos_setpoint(pos_, 0.0f, 0.0f);
     }

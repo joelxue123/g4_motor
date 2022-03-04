@@ -143,7 +143,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
        case 2:
        {
            hfi_state.hfi_time++;
-           motor_.FOC_voltage(8.0f, 0.0f, 0.0f);
+           motor_.FOC_voltage(4.0f, 0.0f, 0.0f);
            if(hfi_state.hfi_time >= 1000)
            {
              hfi_state.encvaluesum = count_in_cpr_ + turn_ * config_.cpr;
@@ -157,7 +157,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
        {
            hfi_state.hfi_time++;
            float ph_ = (float)hfi_state.hfi_time / 8000.0f * 2 * M_PI;
-           motor_.FOC_voltage(8.0f, 0.0f, ph_);
+           motor_.FOC_voltage(4.0f, 0.0f, ph_);
 
            if(hfi_state.hfi_time % 2000 == 0)
            {
@@ -187,7 +187,7 @@ bool OpticalEncoder::calibrate_offset_rotator(Motor& motor_, float __delta)
        {
            hfi_state.hfi_time++;
            float ph_ = 2 * M_PI - (float)hfi_state.hfi_time/ 8000.0f * 2 * M_PI;
-           motor_.FOC_voltage(8.0f, 0.0f, ph_);
+           motor_.FOC_voltage(4.0f, 0.0f, ph_);
 
            if(hfi_state.hfi_time % 2000 == 0)
            {

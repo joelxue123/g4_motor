@@ -16,6 +16,8 @@
 
 #include "motortask.hpp"
 #include "clamper.h"
+#include "motor.hpp"
+#include "global.hpp"
 #include "main.h"
 
 
@@ -44,5 +46,5 @@ bool MotorTask::on_none_realtime_update(uint32_t _tick)
 
 void MotorTask::on_exit(void)
 {
-    clamper_set_torque(0);
+    g_motor.servo_off();
 }

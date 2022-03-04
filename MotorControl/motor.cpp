@@ -31,7 +31,6 @@ void Motor::reset_current_control() {
     current_control_.v_current_control_integral_d = 0.0f;
     current_control_.v_current_control_integral_q = 0.0f;
     state_ = STATE_NORMAL;
-    //error_ = ERROR_NONE;
 }
 
 void Motor::set_error(Error_t error){

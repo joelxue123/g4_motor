@@ -75,7 +75,7 @@ bool Communication::on_high_realtime_update(uint32_t _tick)
     g_clamper_status.StatusWord = clamper_get_status();
     g_clamper_status.AbsPosition = clamper_spi_get_pos();
     g_clamper_status.AbsVelocity = clamper_spi_get_vel();
-    g_clamper_status.AbsTorque = clamper_get_torque();
+    g_clamper_status.AbsTorque = clamper_spi_get_torque();
     clamper_set_status(g_clamper_ctrl.ControlWord);
     clamper_spi_set_vel(g_clamper_ctrl.AbsVelocity);
     clamper_spi_set_torque(g_clamper_ctrl.AbsTorque);
