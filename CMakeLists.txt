@@ -36,8 +36,6 @@ endif ()
 
 include_directories(APP/
                     MotorControl/
-                    NVM/
-                    Communication/Modbus/
                     Board/ERG26/Inc
                     Board/ERG26/EEPROM_Emul/Core/
                     Board/ERG26/EEPROM_Emul/Porting/STM32G4
@@ -53,8 +51,6 @@ add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx)
 
 file(GLOB_RECURSE SOURCES 
     "APP/*.*"
-    "NVM/*.*"
-    "Communication/*.*"
     "Board/*.*" 
     "ThirdParty/*.*"
     "MotorControl/*.*"

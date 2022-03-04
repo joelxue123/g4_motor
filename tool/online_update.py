@@ -17,10 +17,10 @@ def online_update():
     # 通过modbus写文件操作，将更新文件写入从站内存中去
 
     time.sleep(3)
-    rq = client.write_register(0x9104, 1, unit=station_id)
+    rq = client.write_register(0x9104, 2, unit=station_id)
     while rq.isError():
         time.sleep(0.02)
-        rq = client.write_register(0x9104, 1, unit=station_id)
+        rq = client.write_register(0x9104, 2, unit=station_id)
     print("进入更新模式")
 
     client.close()

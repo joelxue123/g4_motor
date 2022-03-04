@@ -45,16 +45,6 @@ uint8_t clamper_gDrop = 0;
 uint8_t clamper_gSTA = 1;
 uint8_t clamper_gOBJ = 0;
 
-void clamper_param_init(void)
-{
-    int i =0;
-    for(i = 0; i< 8; i++)
-    {
-        uint16_t read_address = NVM_CLAMPER_DATA_ADDRESS + i;
-        EE_ReadVariable32bits(read_address, (uint32_t*)clamper_params);
-    }
-}
-
 void clamper_init(void)
 {
     g_motor.init();
@@ -77,9 +67,6 @@ void clamper_init(void)
     clamper_pos_fb = 0;
     clamper_torque_set = 255;
     clamper_torque_fb = 0;
-
-    clamper_param_init();
-    //ee24_read(NVM_CLAMPER_DATA_ADDRESS, (uint8_t*)&clamper_params, 8 * sizeof(clamper_param_t), 100);
 }
 
 uint8_t clamper_get_status(void)
@@ -114,7 +101,7 @@ void clamper_on_update(void)
         g_ctrl.update(g_optical_encoder, _pos_encoder, _clamper_target_iq, g_motor.config_.requested_current_range);
         g_motor.FOC_current(_clamper_target_id, _clamper_target_iq, _phase, 0.0f);
 
-        float abs_vel = fabs(g_optical_encoder.vel_rpm_);
+        float abs_vel = fabsf(g_optical_encoder.vel_rpm_);
         if(abs_vel > 9000.0f)
         {
             clamper_vel_fb = 255;
@@ -124,7 +111,7 @@ void clamper_on_update(void)
             clamper_vel_fb = (uint8_t)(abs_vel / 9000.0f * 255.0f);
         }
 
-        float abs_torque = fabs(g_motor.current_control_.Iq_measured);
+        float abs_torque = fabsf(g_motor.current_control_.Iq_measured);
         if(abs_torque > 0.6f)
         {
             clamper_torque_fb = 255;
@@ -166,10 +153,7 @@ void clamper_on_main(void)
 
     case 1:
         g_motor.config_.requested_current_range = 0.5f;
-        g_ctrl.trap_.config_.vel_limit = 9000.0f * 6.0f;
         g_ctrl.config_.vel_limit = 9000.0f * 6.0f;
-        g_ctrl.trap_.config_.accel_limit = 2000000.0f * 6.0f;
-        g_ctrl.trap_.config_.decel_limit = 2000000.0f * 6.0f;
 
         g_motor.reset_current_control();
         break;
@@ -177,11 +161,8 @@ void clamper_on_main(void)
     case 2:
         g_ctrl.reset();
         _tick_time = 0;
-        g_ctrl.set_current_setpoint(0.3f);
-        //_open_limit_point = 60000;
-        //_close_limit_point = 0;
-        //_clamper_status = 6;
-        _clamper_status = 3;
+        g_ctrl.set_vel_setpoint(5000.0f, 0.4f);
+        _clamper_status = 2;
         break;
 
     case 3:
@@ -197,7 +178,6 @@ void clamper_on_main(void)
 
         if(_tick_time >= 40)
         {
-            g_ctrl.set_current_setpoint(0.0f);
             _open_limit_point = g_ctrl.pos_estimate - 200.0f;
             _clamper_status = 4;
         }
@@ -206,7 +186,7 @@ void clamper_on_main(void)
     case 4:
         g_ctrl.reset();
         _tick_time = 0;
-        g_ctrl.set_current_setpoint(-0.3f);
+         g_ctrl.set_vel_setpoint(-5000.0f, -0.4f);
         _clamper_status = 5;
         break;
 
@@ -365,7 +345,7 @@ void clamper_set_status(uint8_t status)
 
     if(_rGTO == 1)
     {
-        clamper_set_start_move();
+        //clamper_set_start_move();
     }
 
     if(_rstop == 1)
@@ -392,34 +372,6 @@ void clamper_set_pos(uint8_t pos)
     clamper_pos_set = 0xFF - pos;
 }
 
-void clamper_set_start_move(void)
-{
-    if(_clamper_status >= 6)
-    {
-        clamper_gDrop = 0;
-        clamper_gOBJ = 1;
-        g_motor.config_.requested_current_range = (float)clamper_torque_set / 255.0f * 0.35f + 0.15f;
-        g_ctrl.trap_.config_.vel_limit = (float)clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
-        g_ctrl.config_.vel_limit = (float) clamper_vel_set / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
-        g_ctrl.trap_.config_.accel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;
-        g_ctrl.trap_.config_.decel_limit = (float)clamper_torque_set / 255.0f * 1900000.0f * 6.0f + 100000.0f * 6.0f;
-        float pos_ = (float)clamper_pos_set / 255.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
-        float cur_ = g_ctrl.pos_estimate;
-        __disable_irq();
-        g_ctrl.reset();
-        g_motor.reset_current_control();
-        g_ctrl.move_to_pos(pos_, g_ctrl.pos_estimate);
-        if(cur_ > pos_)
-        {
-            _clamper_status = 8;
-        }
-        else {
-            _clamper_status = 18;
-        }
-        __enable_irq();
-    }
-}
-
 uint8_t clamper_get_vel(void)
 {
     return clamper_vel_fb;
@@ -433,111 +385,6 @@ uint8_t clamper_get_torque(void)
 uint8_t clamper_get_pos(void)
 {
     return (0xFF - clamper_pos_fb);
-}
-
-void clamper_set_mode(uint8_t mode)
-{
-    if(mode > 0x7 && mode < 0x10)
-    {
-        if(clamper_params[mode - 8].is_used == 0x5A)
-        {
-            clamper_pos_set = 0xFF - clamper_params[mode - 8].pos_;
-            clamper_vel_set = clamper_params[mode - 8].vel_;
-            clamper_torque_set = clamper_params[mode - 8].tor_;
-        }
-        return;
-    }
-
-    switch (mode) {
-    case 0x1:
-        clamper_pos_set = 0xff;
-        clamper_vel_set = 0x80;
-        clamper_torque_set = 0x80;
-        break;
-    case 0x2:
-        clamper_pos_set = 0x00;
-        clamper_vel_set = 0x80;
-        clamper_torque_set = 0x80;
-        break;
-    case 0x3:
-        clamper_pos_set = 0xff;
-        clamper_vel_set = 0xFF;
-        clamper_torque_set = 0xFF;
-        break;
-    case 0x4:
-        clamper_pos_set = 0x00;
-        clamper_vel_set = 0xFF;
-        clamper_torque_set = 0xFF;
-        break;
-    case 0x5:
-        clamper_pos_set = 0xff;
-        clamper_vel_set = 0x10;
-        clamper_torque_set = 0x10;
-        break;
-    case 0x6:
-        clamper_pos_set = 0x00;
-        clamper_vel_set = 0x10;
-        clamper_torque_set = 0x10;
-        break;
-    default:
-        break;
-    }
-}
-
-void clamper_set_param(char type, uint16_t address, uint8_t data)
-{
-    switch (type) {
-    case 0:
-        {
-            clamper_params[address].pos_ = data;
-            break;
-        }
-    case 1:
-        {
-            clamper_params[address].vel_ = data;
-            break;
-        }
-    case 2:
-        {
-            clamper_params[address].tor_ = data;
-            break;
-        }
-    case 3:
-        {
-            if(data == 1)
-            {
-                clamper_params[address].is_used = 0x5A;
-                uint16_t write_address = NVM_CLAMPER_DATA_ADDRESS + address;
-                HAL_FLASH_Unlock(); 
-                EE_WriteVariable32bits(write_address, (*(uint32_t *)clamper_params)); 
-                HAL_FLASH_Lock();
-                //ee24_write(write_address, (uint8_t *)&clamper_params[address], sizeof(clamper_param_t), 100);
-            }
-            break;
-        }
-    default:
-        break;
-    }
-}
-
-uint16_t clamper_get_param(char type, uint16_t address)
-{
-    switch (type) {
-    case 0:
-        {
-            return clamper_params[address].pos_;
-        }
-    case 1:
-        {
-            return clamper_params[address].vel_;
-        }
-    case 2:
-        {
-            return clamper_params[address].tor_;
-        }
-    default:
-        return 0;
-    }
 }
 
 int8_t clamper_spi_get_vel(void)
@@ -565,7 +412,7 @@ int8_t clamper_spi_get_torque(void)
     }
     else
     {
-        _fb = (uint8_t)(_torque / 0.5f * 255.0f);
+        _fb = (uint8_t)(_torque / 0.55f * 255.0f);
     }
     return _fb;
 }
@@ -601,7 +448,7 @@ void clamper_spi_set_torque(uint8_t torque)
 {
     if(_clamper_status >= 6)
     {
-        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.35f + 0.15f;
+        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.4f + 0.15f;
     }
 }
 
