@@ -10,7 +10,7 @@ import time
 BLOCK_SIZE = 128    # 128 bytes
 
 def online_update():
-    client = ModbusClient(method='rtu', port="COM7",baudrate=115200, stopbits=1, bytesize=8, parity='N')
+    client = ModbusClient(method='rtu', port="COM19",baudrate=115200, stopbits=1, bytesize=8, parity='N')
     client.connect()
     station_id = 0xff
 

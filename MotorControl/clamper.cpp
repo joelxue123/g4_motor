@@ -21,13 +21,6 @@ float _close_limit_point = 0.0f;
 
 int _tick_time = 0;
 
-uint8_t clamper_vel_set = 0;
-uint8_t clamper_vel_fb = 0;
-uint8_t clamper_pos_set = 0;
-uint8_t clamper_pos_fb = 0;
-uint8_t clamper_torque_set = 0;
-uint8_t clamper_torque_fb = 0;
-
 uint8_t clamper_last_rACT = 0;
 uint8_t clamper_last_rGTO = 0;
 
@@ -221,53 +214,51 @@ void clamper_set_status(uint8_t status)
     clamper_last_rGTO = _rGTO;
 }
 
-int8_t clamper_spi_get_vel(void)
+uint8_t clamper_torque_fb = 0;
+uint8_t clamper_vel_fb = 0;
+uint8_t clamper_pos_fb = 0;
+
+uint8_t clamper_spi_get_vel(void)
 {
-    float _vel = g_optical_encoder.vel_abs_rpm_;
-    uint8_t _fb = 0;
-    if(_vel > 10000.0f)
+    if(g_optical_encoder.vel_abs_rpm_ > 10000.0f)
     {
-        _fb = 255;
+        clamper_vel_fb = 255;
     }
     else 
     {
-        _fb = (uint8_t)(_vel / 18000.0f * 255.0f);
+        clamper_vel_fb = (uint8_t)(g_optical_encoder.vel_abs_rpm_ / 10000.0f * 255.0f);
     }
-    return _fb;
+    return clamper_vel_fb;
 }
 
-int8_t clamper_spi_get_torque(void)
+uint8_t clamper_spi_get_torque(void)
 {
-    float _torque = g_motor.extern_torque;
-    uint8_t _fb = 0;
-    if(_torque > 0.5f)
+    if(g_motor.extern_torque > 0.55f)
     {
-        _fb = 255;
+        clamper_torque_fb = 255;
     }
     else
     {
-        _fb = (uint8_t)(_torque / 0.55f * 255.0f);
+        clamper_torque_fb = (uint8_t)(g_motor.extern_torque / 0.55f * 255.0f);
     }
-    return _fb;
+    return clamper_torque_fb;
 }
 
-int32_t clamper_spi_get_pos(void)
+uint8_t clamper_spi_get_pos(void)
 {
-    int32_t pos = 0;
     if(g_ctrl.pos_estimate > _open_limit_point)
     {
-        pos = 255;
+        clamper_pos_fb = 0;
     }
     else if(g_ctrl.pos_estimate < _close_limit_point)
     {
-        pos = 0;
+        clamper_pos_fb = 255;
     }
     else
     {
-        pos = (int32_t)((g_ctrl.pos_estimate - _close_limit_point) / (_open_limit_point - _close_limit_point) * 65535.0f);
+        clamper_pos_fb = 255 - (uint8_t)((g_ctrl.pos_estimate - _close_limit_point) / (_open_limit_point - _close_limit_point) * 255.0f);
     }
-    pos = 255 - pos;
-    return pos;
+    return clamper_pos_fb;
 }
 
 void clamper_spi_set_vel(uint8_t vel)

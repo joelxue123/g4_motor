@@ -21,9 +21,9 @@ uint8_t clamper_get_vel(void);
 uint8_t clamper_get_torque(void);
 uint8_t clamper_get_pos(void);
 
-int8_t clamper_spi_get_vel(void);
-int8_t clamper_spi_get_torque(void);
-int32_t clamper_spi_get_pos(void);
+uint8_t clamper_spi_get_vel(void);
+uint8_t clamper_spi_get_torque(void);
+uint8_t clamper_spi_get_pos(void);
 
 uint8_t clamper_get_status(void);
 
