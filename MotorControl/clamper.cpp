@@ -176,7 +176,7 @@ void clamper_on_main(void)
 
 void _clamper_stop_move(void)
 {
-    if(_clamper_status > 6)
+    if(_clamper_status >= 6)
     {
         __disable_irq();
         g_ctrl.reset();
