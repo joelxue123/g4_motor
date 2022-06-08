@@ -285,6 +285,8 @@ void clamper_spi_set_pos(int32_t pos)
         if(pos > 255) pos = 255;
         pos = 255 - pos;
         float pos_ = (float)pos / 255.0f * (_open_limit_point - _close_limit_point) + _close_limit_point;
+        g_ctrl.reset();
+        g_motor.reset_current_control();
         g_ctrl.set_pos_setpoint(pos_, 0.0f, 0.0f);
     }
 }

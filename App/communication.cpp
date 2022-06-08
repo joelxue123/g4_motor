@@ -28,6 +28,7 @@ extern "C"
 
 Communication * Communication::_instance = nullptr;
 clamper_ctrl_t g_clamper_ctrl = {0};
+clamper_ctrl_t g_clamper_ctrl_last= {0};
 clamper_status_t g_clamper_status = {0};
 TinyFrame g_tiny_frame = {0};
 
@@ -79,14 +80,21 @@ bool Communication::on_high_realtime_update(uint32_t _tick)
     clamper_set_status(g_clamper_ctrl.ControlWord);
     clamper_spi_set_vel(g_clamper_ctrl.AbsVelocity);
     clamper_spi_set_torque(g_clamper_ctrl.AbsTorque);
-    clamper_spi_set_pos(g_clamper_ctrl.AbsPosition);
+    
+    if(g_clamper_ctrl_last.AbsPosition != g_clamper_ctrl.AbsPosition)
+    {
+        clamper_spi_set_pos(g_clamper_ctrl.AbsPosition);
+    }
 
     if(g_clamper_ctrl.boot_flag == 1)
     {
         g_clamper_status.is_boot = 1;
         g_need_bootloader = 1;
     }
-
+    g_clamper_ctrl_last.ControlWord = g_clamper_ctrl.ControlWord;
+    g_clamper_ctrl_last.AbsVelocity = g_clamper_ctrl.AbsVelocity;
+    g_clamper_ctrl_last.AbsTorque = g_clamper_ctrl.AbsTorque;
+    g_clamper_ctrl_last.AbsPosition = g_clamper_ctrl.AbsPosition;
     return true;
 }
 
