@@ -2,7 +2,7 @@
 #include "interface.h"
 #include "utils.hpp"
 
-#define PWM_PERIOD 2125
+#define PWM_PERIOD 2750
 
 Motor::Motor(motor_config_t& _config) 
     : config_(_config)

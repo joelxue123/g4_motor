@@ -50,7 +50,7 @@ motor_config_t g_motor_config =
     .adc_current_k = 3.3f / 4096.0f / 0.02f / 21.0f,        //单位 安培每AD值
     .current_lim = 1.0f,                      // 可测的最大电流值范围，单位[A]
     .requested_current_range = 0.5f,          // 最大输入电流范围，单位[A]
-    .current_control_bandwidth = 1200,  // [rad/s]
+    .current_control_bandwidth = 850,  // [rad/s]
 };
 
 optical_encoder_config_t g_encoder_config =
@@ -63,7 +63,7 @@ optical_encoder_config_t g_encoder_config =
     .offset = 0,        // Offset between encoder count and rotor electrical phase
     .offset_float = 0.5f, // Sub-count phase alignment offset
     .calib_range = 0.02f,
-    .bandwidth = 500.0f,
+    .bandwidth = 300.0f,
 };
 
 Motor g_motor(g_motor_config);

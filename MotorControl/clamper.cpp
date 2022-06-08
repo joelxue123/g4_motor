@@ -91,8 +91,8 @@ void clamper_on_main(void)
         break;
 
     case 1:
-        g_motor.config_.requested_current_range = 0.6f;
-        g_ctrl.config_.vel_limit = 9000.0f * 6.0f;
+        g_motor.config_.requested_current_range = 0.5f;
+        g_ctrl.config_.vel_limit = 5000.0f * 6.0f;
 
         g_motor.reset_current_control();
         break;
@@ -220,26 +220,26 @@ uint8_t clamper_pos_fb = 0;
 
 uint8_t clamper_spi_get_vel(void)
 {
-    if(g_optical_encoder.vel_abs_rpm_ > 10000.0f)
+    if(g_optical_encoder.vel_abs_rpm_ > 5000.0f)
     {
         clamper_vel_fb = 255;
     }
     else 
     {
-        clamper_vel_fb = (uint8_t)(g_optical_encoder.vel_abs_rpm_ / 10000.0f * 255.0f);
+        clamper_vel_fb = (uint8_t)(g_optical_encoder.vel_abs_rpm_ / 5000.0f * 255.0f);
     }
     return clamper_vel_fb;
 }
 
 uint8_t clamper_spi_get_torque(void)
 {
-    if(g_motor.extern_torque > 0.55f)
+    if(g_motor.extern_torque > 0.5f)
     {
         clamper_torque_fb = 255;
     }
     else
     {
-        clamper_torque_fb = (uint8_t)(g_motor.extern_torque / 0.55f * 255.0f);
+        clamper_torque_fb = (uint8_t)(g_motor.extern_torque / 0.5f * 255.0f);
     }
     return clamper_torque_fb;
 }
@@ -265,7 +265,7 @@ void clamper_spi_set_vel(uint8_t vel)
 {
     if(_clamper_status >= 6)
     {
-        g_ctrl.config_.vel_limit = (float) vel / 255.0f * 8500.0f * 6.0f + 500.0f * 6.0f;
+        g_ctrl.config_.vel_limit = (float) vel / 255.0f * 4500.0f * 6.0f + 500.0f * 6.0f;
     }
 }
 
@@ -273,7 +273,7 @@ void clamper_spi_set_torque(uint8_t torque)
 {
     if(_clamper_status >= 6)
     {
-        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.4f + 0.15f;
+        g_motor.config_.requested_current_range = (float)torque / 255.0f * 0.4f + 0.1f;
     }
 }
 
