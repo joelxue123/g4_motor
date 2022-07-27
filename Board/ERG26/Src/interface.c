@@ -27,11 +27,15 @@ STSPIN32G4_HandleTypeDef hdlG4;
 
 void high_realtime_interrupt_init(void)
 {
+    motor_servo_on(0);
+    LL_TIM_GenerateEvent_CC4(TIM1);
+    LL_TIM_EnableAllOutputs(TIM1);
+    LL_TIM_EnableCounter(TIM1);
+
     HAL_StatusTypeDef ret = STSPIN32G4_init(&hdlG4);
     /*************************************************/
     /*   STSPIN32G4 driver component initialization  */
     /*************************************************/
-    STSPIN32G4_init( &hdlG4 );
     STSPIN32G4_reset( &hdlG4 );
     STSPIN32G4_wakeup( &hdlG4, 30);
     STSPIN32G4_setVCC( &hdlG4, (STSPIN32G4_confVCC){ .voltage = _EXT,
@@ -40,10 +44,6 @@ void high_realtime_interrupt_init(void)
     STSPIN32G4_setVDSP( &hdlG4, (STSPIN32G4_confVDSP){ .deglitchTime = _6us,
                                                              .useNFAULT = true } );
     STSPIN32G4_clearFaults( &hdlG4 );
-   
-    LL_TIM_GenerateEvent_CC4(TIM1);
-    LL_TIM_EnableAllOutputs(TIM1);
-    LL_TIM_EnableCounter(TIM1);
     
     LL_ADC_Enable(ADC1);
     LL_ADC_Enable(ADC2);
