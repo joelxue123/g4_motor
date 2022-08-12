@@ -156,8 +156,8 @@ int main(void)
   //ee_status = EE_Init(EE_FORCED_ERASE);
   ///HAL_FLASH_Lock();
   //if(ee_status != EE_OK) {Error_Handler();}
-  HAL_OPAMP_SelfCalibrate(&hopamp2);
-  HAL_OPAMP_SelfCalibrate(&hopamp3);
+  //HAL_OPAMP_SelfCalibrate(&hopamp2);
+  //HAL_OPAMP_SelfCalibrate(&hopamp3);
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
   main_setup();

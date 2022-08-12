@@ -83,20 +83,20 @@ bool Motor::phase_current_from_adcval(void) {
 
     if(current_meas_.phB > config_.current_lim || current_meas_.phB < -config_.current_lim)
     {
-        set_error(ERROR_OVER_CURRENT);
-        return false;
+        //set_error(ERROR_OVER_CURRENT);
+        //return false;
     }
     
     if(bus_udc_filt_ < 17.5f)
     {
-        set_error(ERROR_UNDER_VOLTAGE);
-        return false;
+        //set_error(ERROR_UNDER_VOLTAGE);
+        //return false;
     }
 
     if(bus_udc_filt_ > 30.0f)
     {
-        set_error(ERROR_OVER_VOLTAGE);
-        return false;
+        //set_error(ERROR_OVER_VOLTAGE);
+        //return false;
     }
 
     return true;
@@ -114,14 +114,14 @@ bool Motor::FOC_voltage(float v_d, float v_q, float phase) {
     float tA = 0.0f;
     float tB = 0.0f; 
     float tC = 0.0f;
-    simple_svm(v_alpha, v_beta, bus_udc_filt_, &tA, &tB, &tC);
-    //SVM(v_alpha,v_beta, bus_udc_filt_, &tA, &tB, &tC);
+    //simple_svm(v_alpha, v_beta, bus_udc_filt_, &tA, &tB, &tC);
+    SVM(v_alpha,v_beta, bus_udc_filt_, &tA, &tB, &tC);
         
     int result_valid =
             tA >= 0.0f && tA <= 1.0f
          && tB >= 0.0f && tB <= 1.0f
          && tC >= 0.0f && tC <= 1.0f;
-
+    result_valid = 1;
     if(result_valid)
     {
         A_pwm = (uint32_t)(tA * PWM_PERIOD);

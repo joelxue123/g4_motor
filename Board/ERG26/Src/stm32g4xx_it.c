@@ -63,8 +63,8 @@ volatile uint32_t g_fault_flag = 0;
 /* USER CODE BEGIN PFP */
 inline static void ADC_DataUpdate(void)
 {
-  g_pmsm_ia_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_1);
-  g_pmsm_ib_org = LL_ADC_INJ_ReadConversionData12(ADC2, LL_ADC_INJ_RANK_1);
+  g_pmsm_ia_org = LL_ADC_INJ_ReadConversionData12(ADC2, LL_ADC_INJ_RANK_1);
+  g_pmsm_ib_org = LL_ADC_INJ_ReadConversionData12(ADC2, LL_ADC_INJ_RANK_2);
   g_bus_volt_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2);
   g_fault_flag = (HAL_GPIO_ReadPin(GD_NFAULT_GPIO_Port, GD_NFAULT_Pin) == GPIO_PIN_RESET);
   
