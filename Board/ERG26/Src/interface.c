@@ -17,6 +17,7 @@
 #include "interface.h"
 #include "stm32g4xx.h"
 #include "gpio.h"
+#include "stm32g4xx_hal.h"
 #include "stm32g4xx_ll_tim.h"
 #include "tim.h"
 #include "main.h"
@@ -33,6 +34,7 @@ void high_realtime_interrupt_init(void)
     LL_TIM_EnableCounter(TIM1);
 
     HAL_StatusTypeDef ret = STSPIN32G4_init(&hdlG4);
+    //__HAL_DBGMCU_FREEZE_TIM1();
     /*************************************************/
     /*   STSPIN32G4 driver component initialization  */
     /*************************************************/
@@ -44,12 +46,13 @@ void high_realtime_interrupt_init(void)
     STSPIN32G4_setVDSP( &hdlG4, (STSPIN32G4_confVDSP){ .deglitchTime = _6us,
                                                              .useNFAULT = true } );
     STSPIN32G4_clearFaults( &hdlG4 );
-    
+
     LL_ADC_Enable(ADC1);
     LL_ADC_Enable(ADC2);
     LL_ADC_INJ_StartConversion(ADC2);
     LL_ADC_INJ_StartConversion(ADC1);
-    LL_ADC_EnableIT_JEOS(ADC2);
+    LL_ADC_EnableIT_JEOS(ADC1);
+    
 }
 
 void realtime_interrupt_init(void)

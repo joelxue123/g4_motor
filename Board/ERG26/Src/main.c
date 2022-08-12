@@ -30,6 +30,7 @@
 #include "spi.h"
 #include "stm32g4xx_hal.h"
 #include "stm32g4xx_hal_flash.h"
+#include "stm32g4xx_hal_opamp.h"
 #include "stm32g4xx_hal_rcc.h"
 #include "tim.h"
 #include "usart.h"
@@ -141,7 +142,7 @@ int main(void)
   MX_OPAMP3_Init();
   MX_CRC_Init();
   MX_FMAC_Init();
-  MX_SPI1_Init();
+  MX_SPI2_Init();
   //MX_USART2_UART_Init();
 
   /* Initialize interrupts */
@@ -151,15 +152,15 @@ int main(void)
 
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  HAL_FLASH_Unlock();
-  ee_status = EE_Init(EE_FORCED_ERASE);
-  HAL_FLASH_Lock();
-  if(ee_status != EE_OK) {Error_Handler();}
-
+  //HAL_FLASH_Unlock();
+  //ee_status = EE_Init(EE_FORCED_ERASE);
+  ///HAL_FLASH_Lock();
+  //if(ee_status != EE_OK) {Error_Handler();}
+  HAL_OPAMP_SelfCalibrate(&hopamp2);
+  HAL_OPAMP_SelfCalibrate(&hopamp3);
   HAL_OPAMP_Start(&hopamp2);
   HAL_OPAMP_Start(&hopamp3);
   main_setup();
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -247,8 +248,8 @@ static void MX_NVIC_Init(void)
   HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
   /* SPI1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(SPI1_IRQn);
+  HAL_NVIC_SetPriority(SPI2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(SPI2_IRQn);
   /* USART2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART2_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(USART2_IRQn);

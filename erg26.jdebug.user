@@ -1,0 +1,29 @@
+
+GraphedExpression="g_pmsm_ib_org", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#a00909
+GraphedExpression="g_pmsm_ia_org", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#09a01b
+OpenDocument="startup_stm32g431xx.s", FilePath="D:/Project/erg26_g4/Startup/Gcc/startup_stm32g431xx.s", Line=52
+OpenDocument="taskmanager.cpp", FilePath="D:/Project/erg26_g4/App/taskmanager.cpp", Line=6
+OpenDocument="stm32g4xx_it.c", FilePath="D:/Project/erg26_g4/Board/ERG26/Src/stm32g4xx_it.c", Line=56
+OpenDocument="stm32g4xx_hal.c", FilePath="D:/Project/erg26_g4/ThirdParty/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c", Line=401
+OpenDocument="main.c", FilePath="D:/Project/erg26_g4/Board/ERG26/Src/main.c", Line=90
+OpenDocument="optical_encoder.cpp", FilePath="D:/Project/erg26_g4/MotorControl/optical_encoder.cpp", Line=0
+OpenToolbar="Debug", Floating=0, x=0, y=0
+OpenToolbar="Breakpoints", Floating=0, x=1, y=0
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=216, h=222, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Global Data", DockArea=RIGHT, x=0, y=0, w=1137, h=111, FilterBarShown=1, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Watched Data 1", DockArea=RIGHT, x=0, y=1, w=1137, h=110, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Data Sampling", DockArea=BOTTOM, x=0, y=0, w=1920, h=710, TabPos=1, TopOfStack=0, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
+OpenWindow="Timeline", DockArea=BOTTOM, x=0, y=0, w=1920, h=710, TabPos=0, TopOfStack=1, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=0, CodePaneShown=0, PinCursor="Cursor Movable", TimePerDiv="200 ms / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=1, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="1726;11", PowerGraphDrawAsPoints=0, PowerGraphLegendShown=0, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="273;-46", CodeGraphLegendShown=0, CodeGraphLegendPosition="279;0"
+TableHeader="Data Sampling Table", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";" g_pmsm_ib_org";" g_pmsm_ia_org"], ColWidths=[100;100;100;100]
+TableHeader="Data Sampling Setup", SortCol="Expression", SortOrder="DESCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[414;100;100;100;100;100;100;100;806]
+TableHeader="Global Data", SortCol="Name", SortOrder="DESCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Access";"Scope"], ColWidths=[386;243;215;151;206;0;100]
+TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[232;72;58;72;686]
+TableHeader="Power Sampling", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
+TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh";"Access"], ColWidths=[272;239;104;522;100]
+TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
+TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[200;249;312;1114]
+WatchedExpression="_clamper_status", RefreshRate=2, Window=Watched Data 1
+WatchedExpression="(g_motor).state_", RefreshRate=2, Window=Watched Data 1
+WatchedExpression="(g_motor).calibrate_voltage", RefreshRate=2, Window=Watched Data 1
+WatchedExpression="(g_motor).calibrate_voltage1", RefreshRate=2, Window=Watched Data 1
+WatchedExpression="g_fault_flag", RefreshRate=2, Window=Watched Data 1

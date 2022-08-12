@@ -28,6 +28,7 @@ uint8_t clamper_gACT = 0;
 uint8_t clamper_gDrop = 0;
 uint8_t clamper_gSTA = 1;
 uint8_t clamper_gOBJ = 0;
+uint8_t clamper_pos_set = 0;
 
 void clamper_init(void)
 {
@@ -63,13 +64,13 @@ void clamper_on_update(void)
         {
             g_motor.servo_on();
             g_ctrl.reset();
-            g_ctrl.set_pos_setpoint(0, 0, 0);
-            g_ctrl.vel_ramp_target_ = 0.0f;
+            g_ctrl.set_vel_setpoint(0.0f, 0.0f);
+            //g_ctrl.vel_ramp_target_ = 0.0f;
             _clamper_status = 2;
         }
     }
 
-    if(_clamper_status >= 2)
+    if(_clamper_status >= 2 && _clamper_status < 10)
     {
         float _phase = g_optical_encoder.phase_;
         float _pos_encoder = g_ctrl.pos_estimate;
@@ -85,28 +86,28 @@ void clamper_on_main(void)
     case 0:
         _clamper_target_iq = 0.0f;
         _clamper_target_id = 0.0f;
-        g_motor.init();
+        //g_motor.init();
         g_optical_encoder.init();
         g_motor.servo_off();
         break;
 
     case 1:
-        g_motor.config_.requested_current_range = 0.5f;
-        g_ctrl.config_.vel_limit = 5000.0f * 6.0f;
-
+        g_motor.config_.requested_current_range = 0.4f;
+        g_ctrl.config_.vel_limit = 7500.0f * 6.0f;
         g_motor.reset_current_control();
         break;
 
     case 2:
         g_ctrl.reset();
         _tick_time = 0;
-        g_ctrl.set_vel_setpoint(5000.0f, 0.3f);
+        //g_ctrl.set_current_setpoint(0.15f);
+        g_ctrl.set_vel_setpoint(1500.0f * 6.0f, 0.0f);
         _clamper_status = 3;
         break;
 
     case 3:
         if(g_motor.current_control_.Iq_measured >= 0.1f
-           && g_optical_encoder.vel_rpm_ < 100.0f)
+           && g_optical_encoder.vel_rpm_ < 60.0f)
         {
             _tick_time++;
         }
@@ -125,7 +126,7 @@ void clamper_on_main(void)
     case 4:
         g_ctrl.reset();
         _tick_time = 0;
-        g_ctrl.set_vel_setpoint(-5000.0f, -0.3f);
+        g_ctrl.set_vel_setpoint(-1500.0f * 6.0f, -0.0f);
         _clamper_status = 5;
         break;
 
@@ -147,6 +148,9 @@ void clamper_on_main(void)
             __disable_irq();
             g_ctrl.reset();
             g_motor.reset_current_control();
+            g_motor.config_.requested_current_range = 0.4f;
+            g_ctrl.config_.vel_limit = 7500.0f * 6.0f;
+            //g_ctrl.move_to_pos(_open_limit_point, _close_limit_point);
             g_ctrl.set_pos_setpoint(_open_limit_point, 0.0f, 0.0f);
             _clamper_status = 6;
             __enable_irq();
@@ -156,10 +160,19 @@ void clamper_on_main(void)
     case 6:
         _tick_time = 0;
         break;
-
+    case 7:
+        clamper_spi_set_pos(clamper_pos_set);
+        _clamper_status = 6;
+        break;
     case 11:
         g_motor.error_ = Motor::ERROR_NONE;
         _clamper_status = 6;
+        break;
+    case 12:
+        g_motor.calibrate();
+        _clamper_status = 13;
+        break;
+    case 13:
         break;
     default:
         _clamper_target_iq = 0.0f;

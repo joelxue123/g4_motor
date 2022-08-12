@@ -239,14 +239,22 @@ bool OpticalEncoder::calibrate_offset_clamper(Motor& motor_, float __delta)
        {
            hfi_state.hfi_time++;
            motor_.FOC_voltage(4.0f, 0.0f, 0.0f);
-           if(hfi_state.hfi_time >= 15000)
+           if(hfi_state.hfi_time >= 8000)
            {
              hfi_state.hfi_step = 3;
              hfi_state.hfi_time = 0;
            }
            break;
         }
-        case 3:
+       case 3:
+       {
+           hfi_state.hfi_time++;
+           float ph_ = (float)hfi_state.hfi_time / 8000.0f * 2 * M_PI;
+           //motor_.FOC_current(0.0f, 0.3f, ph_, 0.0f);
+           motor_.FOC_voltage(10.0f, 0.0f, ph_);
+           break;
+       }
+        case 4:
         {
             config_.offset = count_in_cpr_;
             config_.offset_float = 0.0f;

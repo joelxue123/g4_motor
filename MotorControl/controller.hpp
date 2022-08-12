@@ -129,7 +129,7 @@ public:
     float vel_integrator_current_ = 0.0f;  // [A]
     float current_setpoint_ = 0.0f;        // [A]
     float vel_ramp_target_ = 0.0f;
-    bool  vel_ramp_enable_ = true;
+    bool  vel_ramp_enable_ = false;
     float last_vel_set = 0.0f;
     float last_acc_set = 0.0f;
     float last_jerk_set = 0.0f;

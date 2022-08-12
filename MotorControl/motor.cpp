@@ -2,7 +2,7 @@
 #include "interface.h"
 #include "utils.hpp"
 
-#define PWM_PERIOD 2750
+#define PWM_PERIOD (4250)
 
 Motor::Motor(motor_config_t& _config) 
     : config_(_config)
@@ -68,8 +68,6 @@ bool Motor::phase_current_from_adcval(void) {
         current_meas_.phC = -(float) (g_pmsm_ia1_org - ADC_offset_.iaOffset) * k;
     }
     current_meas_.phA = -(current_meas_.phB + current_meas_.phC);
-    //current_meas_.phC = -(current_meas_.phB + current_meas_.phA);
-        //Izero = current_meas_.phA  + current_meas_.phB + current_meas_.phC;
     
     bus_udc_ = ((float)(g_bus_volt_org) / 4096.0f * 3.3f) * 11.0f;
     bus_udc_filt_ = 0.98f * bus_udc_filt_ + 0.02f * bus_udc_;
@@ -89,7 +87,7 @@ bool Motor::phase_current_from_adcval(void) {
         return false;
     }
     
-    if(bus_udc_filt_ < 20.0f)
+    if(bus_udc_filt_ < 17.5f)
     {
         set_error(ERROR_UNDER_VOLTAGE);
         return false;
@@ -248,19 +246,19 @@ bool Motor::FOC_current(float Id_des, float Iq_des, float phase, float omega) {
 // 先给定一个5A的目标电流，得到需要的电压矢量值，然后给一个10A的目标电流，得到新的电压矢量值。
 // 以线性关系近似处理，取这个斜率为相电阻值。
 bool Motor::measure_phase_resistance() {
-    static const float kI = 1.25f;                                 // [(V/s)/A]
-    static const int num_test_cycles = static_cast<int>(4.0f / current_meas_period); // Test runs for 3s
+    static const float kI = 6.2f;                                 // [(V/s)/A]
+    static const int num_test_cycles = static_cast<int>(12.0f / current_meas_period); // Test runs for 3s
     
     if(calibrate_step < num_test_cycles)
     {
-        calibrate_voltage += (kI * current_meas_period) * (5.0f - Ialpha);
-        if(calibrate_voltage > 12.0f || calibrate_voltage < -12.0f)
+        calibrate_voltage += (kI * current_meas_period) * (0.1f - Ialpha);
+        if(calibrate_voltage > 16.0f || calibrate_voltage < -16.0f)
         {
             set_error(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
             servo_off();
             return false;
         }
-        FOC_voltage(calibrate_voltage, 0.0f, M_PI / 2);
+        FOC_voltage(calibrate_voltage, 0.0f, 0.0f);
         calibrate_step++;
         if(calibrate_step == num_test_cycles)
         {
@@ -270,22 +268,22 @@ bool Motor::measure_phase_resistance() {
     }
     else if(calibrate_step >= num_test_cycles && calibrate_step < 2 * num_test_cycles)
     {
-        calibrate_voltage += (kI * current_meas_period) * (10.0f - Ialpha);
-        if(calibrate_voltage > 12.0f || calibrate_voltage < -12.0f)
+        calibrate_voltage += (kI * current_meas_period) * (0.3f - Ialpha);
+        if(calibrate_voltage > 16.0f || calibrate_voltage < -16.0f)
         {
             set_error(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
             servo_off();
             return false;
         }
-        FOC_voltage(calibrate_voltage, 0.0f, M_PI / 2);
+        FOC_voltage(calibrate_voltage, 0.0f, 0.0f);
         calibrate_step++;
         return false;
     }
     else
     {
-        float R = (calibrate_voltage - calibrate_voltage1) / 5.0f;
+        float R = (calibrate_voltage - calibrate_voltage1) / 0.2f;
         phase_resistance = R;
-        if (R < 0.05f || R > 0.5f)
+        if (R < 0.01f || R > 15.0f)
         {
             set_error(ERROR_PHASE_RESISTANCE_OUT_OF_RANGE);
         }
@@ -309,7 +307,7 @@ bool Motor::measure_phase_inductance() {
     }
     else
     {
-        float v_L = 2.0f;
+        float v_L = 12.0f;
         // Note: A more correct formula would also take into account that there is a finite timestep.
         // However, the discretisation in the current control loop inverts the same discrepancy
         float dI_by_dt = (calibrate_Ialphas[0] - calibrate_Ialphas[1]) / (current_meas_period * (float)num_cycles);
@@ -359,7 +357,7 @@ bool Motor::update(void) {
                 if(measure_phase_resistance())
                 {
                     calibrate_step = 0;
-                    calibrate_voltage = 6.0f;
+                    calibrate_voltage = 12.0f;
                     calibrate_Ialphas[0] = 0.0f;
                     calibrate_Ialphas[1] = 0.0f;
                     state_ = STATE_CALIBRE_L;

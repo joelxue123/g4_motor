@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32g4xx_hal_gpio.h"
+#include "stm32g4xx_hal_spi.h"
 #include "stm32g4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -66,19 +67,15 @@ inline static void ADC_DataUpdate(void)
   g_pmsm_ib_org = LL_ADC_INJ_ReadConversionData12(ADC2, LL_ADC_INJ_RANK_1);
   g_bus_volt_org = LL_ADC_INJ_ReadConversionData12(ADC1, LL_ADC_INJ_RANK_2);
   g_fault_flag = (HAL_GPIO_ReadPin(GD_NFAULT_GPIO_Port, GD_NFAULT_Pin) == GPIO_PIN_RESET);
+  
   //g_encoder_value_org = 4095 - LL_TIM_GetCounter(TIM3);
   //g_encoder_value_org = 0;
 }
 
-void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
-  g_encoder_value_org = (g_encoder_value_temp & 0x7fff);
-}
-
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-  HAL_SPI_Receive_IT(hspi, (uint8_t *)(&g_encoder_value_temp), 1);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET);
+  g_encoder_value_org = (g_encoder_value_temp >> 4);
 }
 
 /* USER CODE END PFP */
@@ -91,7 +88,7 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_spi1_rx;
 extern DMA_HandleTypeDef hdma_spi1_tx;
-extern SPI_HandleTypeDef hspi1;
+extern SPI_HandleTypeDef hspi2;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 extern DMA_HandleTypeDef hdma_usart2_rx;
@@ -331,42 +328,7 @@ void DMA1_Channel4_IRQHandler(void)
   /* USER CODE END DMA1_Channel4_IRQn 1 */
 }
 
-/**
-  * @brief This function handles DMA1 channel5 global interrupt.
-  */
-void DMA1_Channel5_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
-#ifdef SYSVIEW_DEBUG
-  SEGGER_SYSVIEW_RecordEnterISR();
-#endif
-  /* USER CODE END DMA1_Channel5_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_spi1_rx);
-  /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
-#ifdef SYSVIEW_DEBUG
-  SEGGER_SYSVIEW_RecordExitISR();
-#endif
-  /* USER CODE END DMA1_Channel5_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 channel6 global interrupt.
-  */
-void DMA1_Channel6_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel6_IRQn 0 */
-#ifdef SYSVIEW_DEBUG
-  SEGGER_SYSVIEW_RecordEnterISR();
-#endif
-  /* USER CODE END DMA1_Channel6_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_spi1_tx);
-  /* USER CODE BEGIN DMA1_Channel6_IRQn 1 */
-#ifdef SYSVIEW_DEBUG
-  SEGGER_SYSVIEW_RecordExitISR();
-#endif
-  /* USER CODE END DMA1_Channel6_IRQn 1 */
-}
-
+int g_spi_time = 0;
 /**
   * @brief This function handles ADC1 and ADC2 global interrupt.
   */
@@ -378,15 +340,20 @@ void ADC1_2_IRQHandler(void)
 #endif
   /* USER CODE END ADC1_2_IRQn 0 */
   /* USER CODE BEGIN ADC1_2_IRQn 1 */
-  if(LL_ADC_IsEnabledIT_JEOS(ADC2))
+  if(LL_ADC_IsEnabledIT_JEOS(ADC1))
   {
-    uint16_t ang_reg_v = 0x8021;
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
-    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *)(&ang_reg_v), 1);
+    uint16_t ang_reg_v = 0x0;
+    g_spi_time++;
+    if(g_spi_time % 5 == 0)
+    {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+      HAL_SPI_TransmitReceive_IT(&hspi2, (uint8_t *)(&ang_reg_v), (uint8_t *)&g_encoder_value_temp, 1);
+      g_spi_time = 0;
+    }
 
     ADC_DataUpdate();
     high_realtime_interrupt();
-    LL_ADC_ClearFlag_JEOS(ADC2);
+    LL_ADC_ClearFlag_JEOS(ADC1);
   }
 #ifdef SYSVIEW_DEBUG
   SEGGER_SYSVIEW_RecordExitISR();
@@ -397,14 +364,14 @@ void ADC1_2_IRQHandler(void)
 /**
   * @brief This function handles SPI1 global interrupt.
   */
-void SPI1_IRQHandler(void)
+void SPI2_IRQHandler(void)
 {
   /* USER CODE BEGIN SPI1_IRQn 0 */
 #ifdef SYSVIEW_DEBUG
   SEGGER_SYSVIEW_RecordEnterISR();
 #endif
   /* USER CODE END SPI1_IRQn 0 */
-  HAL_SPI_IRQHandler(&hspi1);
+  HAL_SPI_IRQHandler(&hspi2);
   /* USER CODE BEGIN SPI1_IRQn 1 */
 #ifdef SYSVIEW_DEBUG
   SEGGER_SYSVIEW_RecordExitISR();

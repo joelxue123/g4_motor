@@ -16,10 +16,16 @@
 
 #include "motortask.hpp"
 #include "clamper.h"
+#include "interface.h"
 #include "motor.hpp"
 #include "global.hpp"
 #include "main.h"
+extern "C"
+{
+    #include "stspin32g4.h"
+}
 
+extern STSPIN32G4_HandleTypeDef hdlG4;
 
 bool MotorTask::on_init(void)
 {
@@ -41,6 +47,10 @@ bool MotorTask::on_realtime_update(uint32_t _tick)
 bool MotorTask::on_none_realtime_update(uint32_t _tick)
 {
     clamper_on_main();
+    if(g_fault_flag == 1)
+    {
+        STSPIN32G4_clearFaults(&hdlG4);
+    }
     return true;
 }
 

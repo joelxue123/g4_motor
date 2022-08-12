@@ -26,8 +26,8 @@ uint32_t TaskManager::realtime_tick = 0;
 uint32_t TaskManager::none_realtime_tick = 0;
 
 MotorTask     g_motor_task;
-Communication g_communication_task;
-LedTask       g_led_task;
+//Communication g_communication_task;
+//LedTask       g_led_task;
 
 bool TaskManager::init()
 {
