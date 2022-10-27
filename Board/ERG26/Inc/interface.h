@@ -23,8 +23,8 @@
 
 #include <stdint.h>
 
-extern volatile int g_pmsm_ia_org;
-extern volatile int g_pmsm_ib_org;
+extern volatile uint16_t g_pmsm_ia_org;
+extern volatile uint16_t g_pmsm_ib_org;
 extern volatile int g_pmsm_ia1_org;
 extern volatile int g_pmsm_ib1_org;
 extern volatile int g_bus_volt_org;

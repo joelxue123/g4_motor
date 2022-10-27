@@ -51,7 +51,7 @@ void high_realtime_interrupt_init(void)
     LL_ADC_Enable(ADC2);
     LL_ADC_INJ_StartConversion(ADC2);
     LL_ADC_INJ_StartConversion(ADC1);
-    LL_ADC_EnableIT_JEOS(ADC1);
+    LL_ADC_EnableIT_JEOS(ADC2);
     
 }
 

@@ -50,7 +50,7 @@ include_directories(APP/
 add_definitions(-DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32G431xx)
 
 file(GLOB_RECURSE SOURCES 
-    "APP/*.*"
+    "App/*.*"
     "Board/*.*" 
     "ThirdParty/*.*"
     "MotorControl/*.*"
